@@ -26,6 +26,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	JPanel pnSouth = new JPanel();
 	
 	String userInfo = null;
+	String todayYear = "2020", todaySemester="1";
 	ImageIcon logoutIcon = new ImageIcon("images/exit-logout.png");
 	ImageIcon leftArrowIcon = new ImageIcon("images/left-arrow.png");
 	
@@ -97,7 +98,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		
 		c.add("Center", pnCenter);
 		c.revalidate();
-		c.repaint();
+		//c.repaint();
 	}
 	
 	/* 관리자 */
@@ -247,6 +248,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	
 	public void professorLecture(String lectureYearValue, String lectureSemesterValue) {
 		c.remove(pnCenter);
+		pnCenter.removeAll();
 		pnCenter.setLayout(new BorderLayout());
 		
 		JPanel pnHeader = new JPanel();
@@ -354,8 +356,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	
 	public void professorLectureStudents(int lectureNo, String lectureYear, String lectureSemester) {
 		c.remove(pnCenter);
-		JPanel pnCenter1 = new JPanel();
-		pnCenter1.setLayout(new BorderLayout());
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
 		
 		JPanel pnHeader = new JPanel();
 		pnHeader.setLayout(new BorderLayout());
@@ -365,9 +367,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		lbBackTracking.setPreferredSize(new Dimension(40,40));
 		lbBackTracking.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				c.remove(pnCenter1);
+				c.remove(pnCenter);
 				professorLecture(lectureYear, lectureSemester);
-				c.add("Center",pnCenter);
 			}
 			public void mouseEntered(MouseEvent e) {
 				lbBackTracking.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -380,27 +381,19 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		pnHeader.add("West", lbBackTracking);
 		pnHeader.add("Center", lbTitle);
 		
-		JPanel pnContent = new JPanel();
 		String[] tableHeader = { "학번", "이름", "중간", "기말", "기타", "출석", "총점", "평점" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
 			stmt = con.createStatement();
-			String query = "SELECT s.student_no, s.student_name, c.attendance_score, c.midterm_score, c.finals_score, c.other_score, c.total_score, c.grade\r\n" +
+			String query = "SELECT s.student_no, s.student_name, c.midterm_score, c.finals_score, c.other_score, c.attendance_score, c.total_score, c.grade\r\n" +
 						   "FROM course c\r\n" + 
 						   "LEFT JOIN lecture l ON l.lecture_no = c.lecture_no\r\n" + 
 						   "LEFT JOIN student s ON s.student_no = c.student_no\r\n" + 
 						   "WHERE c.lecture_no = " + lectureNo;
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), 
-								 rs.getString(2), 
-								 Integer.toString(rs.getInt(3)),
-								 Integer.toString(rs.getInt(4)), 
-								 Integer.toString(rs.getInt(5)), 
-								 Integer.toString(rs.getInt(6)),
-								 Integer.toString(rs.getInt(7)), 
-								 rs.getString(8) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -414,19 +407,235 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				return false;
 			}
 		};
-		JTable students = new JTable(model);
-		//students.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
-		//students.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		JTable studentTable = new JTable(model);
+		studentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		//studentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// 현재 강의중인 강의의 경우 셀 더블클릭하여 성적입력 가능
+		if (lectureYear.equals(todayYear) && lectureSemester.equals(todaySemester)) {
+			studentTable.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					if (e.getClickCount() == 2) {
+						int row = studentTable.getSelectedRow();
+						modifyGrade(lectureNo, lectureYear, lectureSemester, model, row);
+					}
+				}
+				public void mouseEntered(MouseEvent e) {
+					studentTable.setCursor(new Cursor(Cursor.HAND_CURSOR));
+				}
+			});
+		}
+		studentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); 	//여러 행 선택 불가
 		
-		JScrollPane scrollTable = new JScrollPane(students);
+		JScrollPane scrollTable = new JScrollPane(studentTable);
 		//scrollTable.setSize(1695, 775);
 		//scrollTable.setLocation(5, 75);
 		// scrollContent.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		pnCenter1.add("North", pnHeader);
-		pnCenter1.add("Center", scrollTable);
-		c.add("Center", pnCenter1);
+		pnCenter.add("North", pnHeader);
+		pnCenter.add("Center", scrollTable);
+		c.add("Center", pnCenter);
+		c.revalidate();
+		c.repaint();
+	}
+	
+	public void modifyGrade(int lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model, int row) {
+		String studentNo = (String)model.getValueAt(row, 0);
+		String studentName = (String)model.getValueAt(row, 1);
+		String midtermScore = (String)model.getValueAt(row, 2);
+		String finalsScore = (String)model.getValueAt(row, 3);
+		String otherScore = (String)model.getValueAt(row, 4);
+		String attendanceScore = (String)model.getValueAt(row, 5);
+		String totalScore = (String)model.getValueAt(row, 6);
+		String grade = (String)model.getValueAt(row, 7);
+		
+		c.remove(pnCenter);
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
+		
+		JPanel pnHeader = new JPanel();
+		pnHeader.setLayout(new BorderLayout());
+		pnHeader.setBackground(Color.GRAY);
+		
+		JLabel lbTitle = new JLabel("수강생 조회");
+		lbTitle.setHorizontalAlignment(JLabel.LEFT);
+		
+		pnHeader.add("Center", lbTitle);
+		
+		JPanel pnContent = new JPanel();
+		pnContent.setBackground(Color.WHITE);
+		
+		JPanel pnForm = new JPanel();
+		pnForm.setLayout(new GridLayout(9,3,30,10));
+		
+		JLabel lbStudentNo = new JLabel("학번");
+		lbStudentNo.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbStudentName = new JLabel("이름");
+		lbStudentName.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbMidtermScore = new JLabel("중간고사");
+		lbMidtermScore.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbFinalScore = new JLabel("기말고사");
+		lbFinalScore.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbOtherScore = new JLabel("기타");
+		lbOtherScore.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbAttandence = new JLabel("출석");
+		lbAttandence.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbTotalScore = new JLabel("총점");
+		lbTotalScore.setHorizontalAlignment(JLabel.RIGHT);
+		JLabel lbGrade = new JLabel("평점");
+		lbGrade.setHorizontalAlignment(JLabel.RIGHT);
+		
+		JTextField tfStudentNo = new JTextField();
+		tfStudentNo.setText(studentNo);
+		tfStudentNo.setEditable(false);
+		JTextField tfStudentName = new JTextField();
+		tfStudentName.setText(studentName);
+		tfStudentName.setEditable(false);
+		JTextField tfMidtermScore = new JTextField();
+		tfMidtermScore.setText(midtermScore);
+		JTextField tfFinalsScore = new JTextField();
+		tfFinalsScore.setText(finalsScore);
+		JTextField tfOtherScore = new JTextField();
+		tfOtherScore.setText(otherScore);
+		JTextField tfAttandence = new JTextField();
+		tfAttandence.setText(attendanceScore);
+		JTextField tfTotalScore = new JTextField();
+		tfTotalScore.setText(totalScore);
+		JTextField tfGrade = new JTextField();
+		tfGrade.setText(grade);
+		
+		JPanel pnBtn = new JPanel();
+		pnBtn.setPreferredSize(new Dimension(430,70));
+		JButton btnInput = new JButton("입력");
+		btnInput.setPreferredSize(new Dimension(200,50));
+		btnInput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int result = JOptionPane.showConfirmDialog(null, "성적을 수정하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+				if (result == JOptionPane.OK_OPTION) {
+					try {
+						stmt = con.createStatement();
+						String query = String.format("UPDATE course \nSET midterm_score = %s, finals_score = %s, other_score = %s, attendance_score = %s, total_score = %s, grade = '%s' \nWHERE lecture_no = %s AND student_no = %s", 
+								tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText(), tfTotalScore.getText(), tfGrade.getText(), lectureNo, tfStudentNo.getText());
+						System.out.println(query);
+						stmt.execute(query);
+						professorLectureStudents(lectureNo, lectureYear, lectureSemester);
+					} catch (SQLException e1) {
+						System.out.println("업데이트 실패 :" + e1);
+					}
+				} else if (result == JOptionPane.CANCEL_OPTION) {
+					
+				}
+			}
+		});
+		JButton btnCancel = new JButton("취소");
+		btnCancel.setPreferredSize(new Dimension(200,50));
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				professorLectureStudents(lectureNo, lectureYear, lectureSemester);
+			}
+		});
+		pnBtn.add(btnInput);
+		pnBtn.add(btnCancel);
+		
+		pnForm.add(lbStudentNo);
+		pnForm.add(tfStudentNo);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbStudentName);
+		pnForm.add(tfStudentName);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbMidtermScore);
+		pnForm.add(tfMidtermScore);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbFinalScore);
+		pnForm.add(tfFinalsScore);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbOtherScore);
+		pnForm.add(tfOtherScore);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbAttandence);
+		pnForm.add(tfAttandence);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbTotalScore);
+		pnForm.add(tfTotalScore);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(lbGrade);
+		pnForm.add(tfGrade);
+		pnForm.add(new JLabel(" "));
+		pnForm.add(new JLabel(" "));
+		pnForm.add(pnBtn);
+		//pnForm.add(btnInput);
+		//pnForm.add(btnCancel);
+		
+		pnContent.add(pnForm);
+		
+		pnCenter.add("North", pnHeader);
+		pnCenter.add("Center", pnContent);
+		
+		c.add("Center", pnCenter);
+		c.revalidate();
+		c.repaint();
+	}
+	
+	public void professorTutoring() {
+		c.remove(pnCenter);
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
+		
+		/* 헤더 */
+		JPanel pnHeader = new JPanel();
+		pnHeader.setLayout(new BorderLayout());
+		pnHeader.setBackground(Color.GRAY);
+		JLabel lbTitle = new JLabel(todayYear + "년" + todaySemester + "학기 지도학생 목록");
+		lbTitle.setHorizontalAlignment(JLabel.LEFT);
+		pnHeader.add("Center", lbTitle);
+		
+		/* 내용 */
+		JPanel pnContent = new JPanel();
+		String[] tableHeader = { "학번", "이름", "학년", "전화번호", "이메일", "주소", "전공", "부전공", "계좌" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			
+		}
+		
+		
+		JTextField lectureYear = new JTextField();
+		lectureYear.setText(lectureYearValue);
+		lectureYear.setPreferredSize(new Dimension(100, 30));
+		lectureYear.setHorizontalAlignment(JTextField.RIGHT);
+		
+		JTextField lectureSemester = new JTextField();
+		lectureSemester.setText(lectureSemesterValue);
+		lectureSemester.setPreferredSize(new Dimension(100, 30));
+		lectureSemester.setHorizontalAlignment(JTextField.RIGHT);
+		
+		JButton btnInquire = new JButton("조회");
+		btnInquire.setHorizontalAlignment(JButton.RIGHT);
+		btnInquire.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(pnCenter.getComponentCount());
+				if (pnCenter.getComponentCount() > 1) { // 이미 scrollContent 존재하면 제거
+					pnCenter.remove(1);
+				}
+				JScrollPane scrollContent = new JScrollPane(findLectureByProfessor(lectureYear.getText(), lectureSemester.getText()));
+				//scrollContent.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				scrollContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				pnCenter.add("Center",scrollContent);
+				c.revalidate();
+				c.repaint();
+			}
+		});
+		pnCondition.add(lectureYear);
+		pnCondition.add(lectureSemester);
+		pnCondition.add(btnInquire);
+		
+		pnHeader.add("Center", lbTitle);
+		pnHeader.add("East", pnCondition);
+		
+		pnCenter.add("North", pnHeader);
+		c.add("Center", pnCenter);
 		c.revalidate();
 		c.repaint();
 	}
