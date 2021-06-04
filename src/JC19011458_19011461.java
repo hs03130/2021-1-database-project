@@ -173,7 +173,34 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 	}
 
-	public void adminInitDB() {}
+	public void adminInitDB() {
+		c.remove(pnCenter);
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
+
+		JPanel pnHeader = new JPanel();
+		pnHeader.setLayout(new BorderLayout());
+		pnHeader.setBackground(Color.GRAY);
+		JLabel lbTitle = new JLabel("데이터베이스 초기화");
+		lbTitle.setHorizontalAlignment(JLabel.LEFT);
+		pnHeader.add("Center", lbTitle);
+		
+		JPanel pnContent = new JPanel();
+		JButton btnInitDB = new JButton("초기화");
+		btnInitDB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				InitDataBase init = new InitDataBase(con, stmt);
+			}
+		});
+		pnContent.add(btnInitDB);
+		
+		pnCenter.add("North", pnHeader);
+		pnCenter.add("Center", btnInitDB);
+		c.add("Center", pnCenter);
+		c.revalidate();
+		c.repaint();
+	}
+	
 	public void adminAdministration() {}
 	public void adminEntire() {}
 	
