@@ -135,30 +135,34 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		pnBtn.setLayout(new GridLayout(3, 1, 5, 5));
 		pnBtn.setPreferredSize(new Dimension(90, 180));
 
-		JButton btnInitDB = new JButton("초기화");
-		btnInitDB.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				adminInitDB();
-			}
-		});
-
-		JButton btnAdministration = new JButton("관리");
-		btnAdministration.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				adminAdministration();
-			}
-		});
-
 		JButton btnEntire = new JButton("전체");
 		btnEntire.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				adminEntire();
 			}
 		});
-
-		pnBtn.add(btnInitDB);
-		pnBtn.add(btnAdministration);
+		JButton btnAdministration = new JButton("관리");
+		btnAdministration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				adminAdministration();
+			}
+		});
+		JButton btnInitDB = new JButton("초기화");
+		btnInitDB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int result = JOptionPane.showConfirmDialog(null, "DB를 초기화 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+				if (result == JOptionPane.OK_OPTION) {
+					InitDataBase init = new InitDataBase(con, stmt);
+					// 초기화 확인
+					JOptionPane.showMessageDialog(null, "DB가 초기화 되었습니다.", "", JOptionPane.PLAIN_MESSAGE);
+				} else if (result == JOptionPane.CANCEL_OPTION) {
+				
+				}
+			}
+		});
 		pnBtn.add(btnEntire);
+		pnBtn.add(btnAdministration);
+		pnBtn.add(btnInitDB);
 
 		pnWest.removeAll();
 		pnWest.add(pnBtn);
@@ -202,7 +206,165 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	}
 	
 	public void adminAdministration() {}
-	public void adminEntire() {}
+	public void adminEntire() {
+		//교수, 학과, 교수 소속, 강좌, 학생, 등록, 지도관계, 수강, 동아리, 동아리원
+		c.remove(pnCenter);
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
+		
+		/* 헤더 */
+		JPanel pnHeader = new JPanel();
+		pnHeader.setLayout(new BorderLayout());
+		pnHeader.setBackground(Color.GRAY);
+		JLabel lbTitle = new JLabel("전체 테이블");
+		lbTitle.setHorizontalAlignment(JLabel.LEFT);
+
+		JPanel pnBtn = new JPanel();
+		JButton btnProfessor = new JButton("교수");
+		JButton btnDepartment = new JButton("학과");
+		JButton btnAffiliatedProfessor = new JButton("교수 소속");
+		JButton btnLecture = new JButton("강의");
+		JButton btnStudent = new JButton("학생");
+		JButton btnTuition = new JButton("등록");
+		JButton btnTutoring = new JButton("지도관계");
+		JButton btnCourse = new JButton("수강");
+		JButton btnClub = new JButton("동아리");
+		JButton btnClubJoin = new JButton("동아리원");
+		
+		btnProfessor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableProfessor());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnDepartment.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableDepartment());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnAffiliatedProfessor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableAffiliatedProfessor());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnLecture.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableLecture());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnStudent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableStudent());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnTuition.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableTuition());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnTutoring.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableTutoring());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnCourse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableCourse());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnClub.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableClub());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		btnClubJoin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				pnCenter.add("Center", showTableClubJoin());
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				//c.repaint();
+			}
+		});
+		
+		pnBtn.add(btnProfessor);
+		pnBtn.add(btnDepartment);
+		pnBtn.add(btnAffiliatedProfessor);
+		pnBtn.add(btnLecture);
+		pnBtn.add(btnStudent);
+		pnBtn.add(btnTuition);
+		pnBtn.add(btnTutoring);
+		pnBtn.add(btnCourse);
+		pnBtn.add(btnClub);
+		pnBtn.add(btnClubJoin);
+		
+		pnHeader.add("Center", lbTitle);
+		pnHeader.add("East", pnBtn);
+		
+
+
+		pnCenter.add("North", pnHeader);
+//		pnCenter.add("Center", pnContent);
+		c.add("Center", pnCenter);
+		c.revalidate();
+		c.repaint();
+		
+	}
 	
 	/* 교수 */
 	public void professorLogin() {
@@ -718,6 +880,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 					+ "WHERE s.student_no IN (SELECT student_no FROM tutoring WHERE professor_no = " + userInfo
 					+ ")\r\n"
 					+ "AND t.grade_semester = (SELECT grade_semester FROM tuition WHERE student_no = s.student_no ORDER BY grade_semester DESC LIMIT 1)";
+			System.out.println(query);
+			
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
@@ -1177,7 +1341,65 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 	}
 
-	public void studentCourse() {}
+	public void studentCourse() {
+//		if (c.getComponentCount() == 3) { // pnCenter 존재하면
+//			c.remove(2);
+//		}
+//		JPanel pnCenter = new JPanel();
+//		pnCenter.setLayout(null);
+//
+//		JPanel pnHeader = new JPanel();
+//		pnHeader.setLayout(null);
+//		pnHeader.setSize(1700, 70);
+//		pnHeader.setLocation(0, 0);
+//		pnHeader.setBackground(Color.GRAY);
+//
+//		JLabel title = new JLabel("수강 내역");
+//		title.setSize(100, 60);
+//		title.setLocation(5, 5);
+//		title.setOpaque(true); // Opaque값을 true로 미리 설정해 주어야 배경색이 적용된다.
+//		title.setBackground(Color.white);
+//
+//		JTextField grade = new JTextField();
+//		grade.setSize(200, 60);
+//		grade.setLocation(1175, 5);
+//		grade.setText("3");
+//
+//		JTextField semester = new JTextField();
+//		semester.setSize(200, 60);
+//		semester.setLocation(1380, 5);
+//		semester.setText("1");
+//
+//		JButton btnInquire = new JButton("조회");
+//		btnInquire.setSize(100, 60);
+//		btnInquire.setLocation(1585, 5);
+//		btnInquire.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				if (pnCenter.getComponentCount() == 2) { // 이미 scrollContent 존재하면 제거
+//					pnCenter.remove(1);
+//				}
+//				JScrollPane pnContentScroll = new JScrollPane(
+//						findCourseByStudent(user, grade.getText(), semester.getText()));
+//				pnContentScroll.setSize(1695, 775);
+//				pnContentScroll.setLocation(5, 75);
+//				// scrollContent.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//				pnContentScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//
+//				pnCenter.add(pnContentScroll);
+//				pnCenter.revalidate();
+//				pnCenter.repaint();
+//			}
+//		});
+//		pnHeader.add(title);
+//		pnHeader.add(grade);
+//		pnHeader.add(semester);
+//		pnHeader.add(btnInquire);
+//
+//		pnCenter.add(pnHeader);
+//		c.add("Center", pnCenter);
+//		c.revalidate();
+//		c.repaint();
+	}
 	public void studentTimetable() {}
 	public void studentClub() {}
 	public void studentGrade() {}
@@ -1252,4 +1474,347 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 	}
 
+	// DB 테이블 반환
+	public JScrollPane showTableProfessor() {
+//		/* 내용 */
+		String[] tableHeader = { "professor_no", "professor_name", "professor_address", "professor_phone", "professor_email" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT professor_no, professor_name, professor_address, professor_phone, professor_email FROM professor";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		return pnContent;
+	}
+	public JScrollPane showTableDepartment() {
+		/* 내용 */
+		String[] tableHeader = { "department_no", "department_name", "department_contact", "department_office", "professor_no" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT department_no, department_name, department_contact, department_office, professor_no FROM department";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableAffiliatedProfessor() {
+		/* 내용 */
+		String[] tableHeader = { "professor_no", "department_no" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT professor_no, department_no FROM affiliated_professor";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableLecture() {
+		/* 내용 */
+		String[] tableHeader = { "lecture_no", "lecture_class_no", "lecture_name", "lecture_day1", "lecture_period1", "lecture_day2", "lecture_period2", "lecture_credit", "lecture_time", "lecture_room", "department_no", "professor_no", "lecture_year", "lecture_semester" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT lecture_no, lecture_class_no, lecture_name, lecture_day1, lecture_period1, lecture_day2, lecture_period2, lecture_credit, lecture_time, lecture_room, department_no, professor_no, lecture_year, lecture_semester FROM lecture";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12), rs.getString(13), rs.getString(14) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableStudent() {
+		/* 내용 */
+		String[] tableHeader = { "student_no", "student_name", "student_address", "student_phone", "student_email", "student_account", "major_no", "minor_no" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT student_no, student_name, student_address, student_phone, student_email, student_account, major_no, minor_no FROM student";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableTuition() {
+		/* 내용 */
+		String[] tableHeader = { "student_no", "tuition_year", "tuition_semester", "tuition_fee", "tuition_payment", "last_payment_date", "grade_semester" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT student_no, tuition_year, tuition_semester, tuition_fee, tuition_payment, last_payment_date, grade_semester FROM tuition ORDER BY tuition_year DESC, tuition_semester DESC, student_no";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableTutoring() {
+		/* 내용 */
+		String[] tableHeader = { "student_no", "professor_no", "grade_semester" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT student_no, professor_no, grade_semester FROM tutoring";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableCourse() {
+		/* 내용 */
+		String[] tableHeader = { "lecture_no", "student_no", "midterm_score", "finals_score", "other_score", "attendance_score", "total_score", "grade" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT lecture_no, student_no, midterm_score, finals_score, other_score, attendance_score, total_score, grade FROM course";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableClub() {
+		/* 내용 */
+		String[] tableHeader = { "club_no", "club_name", "club_room", "professor_no", "student_no", "club_total_member" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT club_no, club_name, club_room, professor_no, student_no, club_total_member FROM club";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	public JScrollPane showTableClubJoin() {
+		/* 내용 */
+		String[] tableHeader = { "club_no", "student_no" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
+		try {
+			stmt = con.createStatement();
+			String query = "SELECT club_no, student_no FROM club_join";
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String[] str = { rs.getString(1), rs.getString(2) };
+				strList.add(str);
+			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
+		} catch (SQLException e) {
+			System.out.println("쿼리 읽기 실패 :" + e);
+		}
+
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+
+		JTable departmentTable = new JTable(model);
+		departmentTable.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(departmentTable);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		return pnContent;
+	}
+	
 }
