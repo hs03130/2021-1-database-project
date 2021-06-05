@@ -7,6 +7,9 @@ import static javax.swing.JOptionPane.showMessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -134,7 +137,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		pnNorth.add("East", pnUser);
 
 		JPanel pnBtn = new JPanel();
-		pnBtn.setLayout(new GridLayout(3, 1, 5, 5));
+		pnBtn.setLayout(new GridLayout(4, 1, 5, 5));
 		pnBtn.setPreferredSize(new Dimension(90, 180));
 
 		JButton btnEntire = new JButton("전체");
@@ -162,9 +165,16 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				}
 			}
 		});
+		JButton btnOthers = new JButton("기타");
+		btnOthers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				adminOthers();
+			}
+		});
 		pnBtn.add(btnEntire);
 		pnBtn.add(btnAdministration);
 		pnBtn.add(btnInitDB);
+		pnBtn.add(btnOthers);
 
 		pnWest.removeAll();
 		pnWest.add(pnBtn);
@@ -371,6 +381,133 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 	}
 
+	public void adminOthers() {
+		c.remove(pnCenter);
+		pnCenter.removeAll();
+		pnCenter.setLayout(new BorderLayout());
+		
+		/* 헤더 */
+		JPanel pnHeader = new JPanel();
+		pnHeader.setLayout(new BorderLayout());
+		pnHeader.setBackground(Color.GRAY);
+		JLabel lbTitle = new JLabel("기타 기능들");
+		lbTitle.setHorizontalAlignment(JLabel.LEFT);
+
+		JPanel pnBtn = new JPanel();
+		JButton btnSetYearSemester = new JButton("학년/학기 설정");
+		
+		btnSetYearSemester.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pnCenter.removeAll();
+				pnCenter.add("North", pnHeader);
+				
+				/* 내용 */
+				JLabel lbYear = new JLabel("연도");
+				JTextField year = new JTextField();
+				JLabel lbSemester = new JLabel("학기");
+				JTextField semester = new JTextField();
+				JButton btn = new JButton("변경");
+				
+				lbYear.setHorizontalAlignment(JLabel.CENTER);
+				year.setPreferredSize(new Dimension(200,40));
+				year.setText(todayYear);
+				year.addKeyListener(new KeyListener() {
+					public void keyTyped(KeyEvent e) {}
+					public void keyPressed(KeyEvent e) {}
+				    public void keyReleased(KeyEvent e) {
+						if (!year.getText().equals(todayYear)) {
+							btn.setEnabled(true);
+						}
+				    }
+				});
+				
+				lbSemester.setHorizontalAlignment(JLabel.CENTER);
+				semester.setPreferredSize(new Dimension(200,40));
+				semester.setText(todaySemester);
+				semester.addKeyListener(new KeyListener() {
+					public void keyTyped(KeyEvent e) {}
+					public void keyPressed(KeyEvent e) {}
+				    public void keyReleased(KeyEvent e) {
+						if (!semester.getText().equals(todaySemester)) {
+							btn.setEnabled(true);
+						}
+				    }
+				});
+				
+				btn.setPreferredSize(new Dimension(60,40));
+				btn.setEnabled(false);
+				btn.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {
+							Integer.parseInt(year.getText());
+						} catch(NumberFormatException ex) {
+							JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+							year.setText("");
+							year.requestFocus();
+							return;
+						}
+						try {
+							Integer.parseInt(semester.getText());
+						} catch(NumberFormatException ex) {
+							JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+							semester.setText("");
+							semester.requestFocus();
+							return;
+						}
+						if (year.getText().length() != 4) {
+							JOptionPane.showMessageDialog(null, "연도가 올바르지 않습니다.", "", JOptionPane.PLAIN_MESSAGE);
+							year.requestFocus();
+							return;
+						}
+						if (!semester.getText().equals("1") && !semester.getText().equals("2")) {
+							JOptionPane.showMessageDialog(null, "학기는 '1' 또는 '2'만 입력 가능합니다.", "", JOptionPane.PLAIN_MESSAGE);
+							semester.requestFocus();
+							return;
+						}
+						
+						int result = JOptionPane.showConfirmDialog(null, "연도/학기를 수정하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+						if (result == JOptionPane.OK_OPTION) {
+							todayYear = year.getText().replace(" ", "");
+							todaySemester = semester.getText();
+							JOptionPane.showMessageDialog(null, "수정되었습니다.", "", JOptionPane.PLAIN_MESSAGE);
+							btnSetYearSemester.doClick();
+						} else if (result == JOptionPane.CANCEL_OPTION) {
+							
+						}
+					}
+				});
+			
+				JPanel pnForm = new JPanel();
+				pnForm.add(lbYear);
+				pnForm.add(year);
+				pnForm.add(lbSemester);
+				pnForm.add(semester);
+				pnForm.add(new JLabel(""));
+				pnForm.add(btn);
+				
+				JPanel pnContent = new JPanel();
+				pnContent.setLayout(new GridLayout(3,1,10,10));
+				pnContent.add(new JLabel(""));
+				pnContent.add(pnForm);
+				pnContent.add(new JLabel(""));
+				
+				pnCenter.add("Center", pnContent);
+				c.remove(pnCenter);
+				c.add("Center", pnCenter);
+				c.revalidate();
+				c.repaint();
+			}
+		});
+		
+		pnBtn.add(btnSetYearSemester);
+		pnHeader.add("Center", lbTitle);
+		pnHeader.add("East", pnBtn);
+		pnCenter.add("North", pnHeader);
+		c.add("Center", pnCenter);
+		c.revalidate();
+		c.repaint();
+	}
+	
 	/* 교수 */
 	public void professorLogin() {
 		c.removeAll();
@@ -487,7 +624,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JButton btnLecture = new JButton("강의");
 		btnLecture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				professorLecture("2021", "1");
+				professorLecture(todayYear, todaySemester);
 			}
 		});
 
@@ -545,12 +682,12 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JPanel pnCondition = new JPanel();
 
 		JTextField lectureYear = new JTextField();
-		lectureYear.setText(lectureYearValue);
+		lectureYear.setText(todayYear);
 		lectureYear.setPreferredSize(new Dimension(100, 30));
 		lectureYear.setHorizontalAlignment(JTextField.RIGHT);
 
 		JTextField lectureSemester = new JTextField();
-		lectureSemester.setText(lectureSemesterValue);
+		lectureSemester.setText(todaySemester);
 		lectureSemester.setPreferredSize(new Dimension(100, 30));
 		lectureSemester.setHorizontalAlignment(JTextField.RIGHT);
 
@@ -1832,6 +1969,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		return result;
 	}
 
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 //		try {
@@ -1889,7 +2027,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 	// DB 테이블 반환
 	public JScrollPane showTableProfessor() {
-//		/* 내용 */
+		/* 내용 */
 		String[] tableHeader = { "professor_no", "professor_name", "professor_address", "professor_phone", "professor_email" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
