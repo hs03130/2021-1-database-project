@@ -3037,7 +3037,8 @@ public class JC19011458_19011461 extends JFrame {
 		JPanel pnDelete = new JPanel();
 		pnDelete.setLayout(new BorderLayout());
 		pnDelete.setBackground(Color.WHITE);
-
+		
+		/* 입력 */
 		JPanel pnInsertGrid = new JPanel();
 		pnInsertGrid.setLayout(new GridLayout(9, 2, 5, 5));
 		JTextField insert_student_no = new JTextField();
@@ -3159,44 +3160,15 @@ public class JC19011458_19011461 extends JFrame {
 		pnUpdate.add("Center", pnUpdateGrid);
 		
 		/* 삭제 */
-		JPanel pnDeleteGrid = new JPanel();
-		pnDeleteGrid.setLayout(new GridLayout(10, 2, 5, 5));
-		JTextField delete_student_no = new JTextField();
-		JTextField delete_student_name = new JTextField();
-		JTextField delete_student_address = new JTextField();
-		JTextField delete_student_phone = new JTextField();
-		JTextField delete_student_email = new JTextField();
-		JTextField delete_student_account = new JTextField();
-		JTextField delete_major_no = new JTextField();
-		JTextField delete_minor_no = new JTextField();
 		JTextField delete_where = new JTextField();
 		JButton btnDelete = new JButton("삭제");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {}
 		});
-		
-		pnDeleteGrid.add(new JLabel("student_no"));
-		pnDeleteGrid.add(delete_student_no);
-		pnDeleteGrid.add(new JLabel("student_name"));
-		pnDeleteGrid.add(delete_student_name);
-		pnDeleteGrid.add(new JLabel("student_address"));
-		pnDeleteGrid.add(delete_student_address);
-		pnDeleteGrid.add(new JLabel("student_phone"));
-		pnDeleteGrid.add(delete_student_phone);
-		pnDeleteGrid.add(new JLabel("student_email"));
-		pnDeleteGrid.add(delete_student_email);
-		pnDeleteGrid.add(new JLabel("student_account"));
-		pnDeleteGrid.add(delete_student_account);
-		pnDeleteGrid.add(new JLabel("major_no"));
-		pnDeleteGrid.add(delete_major_no);
-		pnDeleteGrid.add(new JLabel("minor_no"));
-		pnDeleteGrid.add(delete_minor_no);
-		pnDeleteGrid.add(new JLabel("WHERE "));
-		pnDeleteGrid.add(delete_where);
-		pnDeleteGrid.add(new JLabel(""));
-		pnDeleteGrid.add(btnDelete);
-		pnDelete.add("North", new JLabel("DELETE FROM student"));
-		pnDelete.add("Center", pnDeleteGrid);
+
+		pnDelete.add("North", new JLabel("DELETE FROM student WHERE"));
+		pnDelete.add("Center", delete_where);
+		pnDelete.add("South", btnDelete);
 
 		pnContent.add(pnInsert);
 		pnContent.add(pnUpdate);
@@ -3357,41 +3329,15 @@ public class JC19011458_19011461 extends JFrame {
 		pnUpdate.add("Center", pnUpdateGrid);
 		
 		/* 삭제 */
-		JPanel pnDeleteGrid = new JPanel();
-		pnDeleteGrid.setLayout(new GridLayout(9, 2, 5, 5));
-		JTextField delete_student_no = new JTextField();
-		JTextField delete_tuition_year = new JTextField();
-		JTextField delete_tuition_semester = new JTextField();
-		JTextField delete_tuition_fee = new JTextField();
-		JTextField delete_tuition_payment = new JTextField();
-		JTextField delete_last_payment_date = new JTextField();
-		JTextField delete_grade_semester = new JTextField();
 		JTextField delete_where = new JTextField();
 		JButton btnDelete = new JButton("삭제");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {}
 		});
-		
-		pnDeleteGrid.add(new JLabel("student_no"));
-		pnDeleteGrid.add(delete_student_no);
-		pnDeleteGrid.add(new JLabel("tuition_year"));
-		pnDeleteGrid.add(delete_tuition_year);
-		pnDeleteGrid.add(new JLabel("tuition_semester"));
-		pnDeleteGrid.add(delete_tuition_semester);
-		pnDeleteGrid.add(new JLabel("tuition_fee"));
-		pnDeleteGrid.add(delete_tuition_fee);
-		pnDeleteGrid.add(new JLabel("tuition_payment"));
-		pnDeleteGrid.add(delete_tuition_payment);
-		pnDeleteGrid.add(new JLabel("last_payment_date"));
-		pnDeleteGrid.add(delete_last_payment_date);
-		pnDeleteGrid.add(new JLabel("grade_semester"));
-		pnDeleteGrid.add(delete_grade_semester);
-		pnDeleteGrid.add(new JLabel("WHERE "));
-		pnDeleteGrid.add(delete_where);
-		pnDeleteGrid.add(new JLabel(""));
-		pnDeleteGrid.add(btnDelete);
-		pnDelete.add("North", new JLabel("DELETE FROM tuition"));
-		pnDelete.add("Center", pnDeleteGrid);
+
+		pnDelete.add("North", new JLabel("DELETE FROM tuition WHERE"));
+		pnDelete.add("Center", delete_where);
+		pnDelete.add("South", btnDelete);
 
 		pnContent.add(pnInsert);
 		pnContent.add(pnUpdate);
@@ -3454,6 +3400,14 @@ public class JC19011458_19011461 extends JFrame {
 		/* 수정 */
 		JPanel pnUpdateGrid = new JPanel();
 		pnUpdateGrid.setLayout(new GridLayout(8, 2, 5, 5));
+		JCheckBox update_club_no_check = new JCheckBox("club_no");
+		JCheckBox update_club_name_check = new JCheckBox("club_name");
+		JCheckBox update_club_total_member_check = new JCheckBox("club_total_member");
+		JCheckBox update_club_room_check = new JCheckBox("club_room");
+		JCheckBox update_professor_no_check = new JCheckBox("professor_no");
+		JCheckBox update_student_no_check = new JCheckBox("professor_no");
+		JLabel update_where_check = new JLabel("WHERE ");
+		
 		JTextField update_club_no = new JTextField();
 		JTextField update_club_name = new JTextField();
 		JTextField update_club_total_member = new JTextField();
@@ -3514,58 +3468,35 @@ public class JC19011458_19011461 extends JFrame {
 			}
 		});
 		
-		pnUpdateGrid.add(new JLabel("club_no"));
+		pnUpdateGrid.add(update_club_no_check);
 		pnUpdateGrid.add(update_club_no);
-		pnUpdateGrid.add(new JLabel("club_name"));
+		pnUpdateGrid.add(update_club_name_check);
 		pnUpdateGrid.add(update_club_name);
-		pnUpdateGrid.add(new JLabel("club_total_member"));
+		pnUpdateGrid.add(update_club_total_member_check);
 		pnUpdateGrid.add(update_club_total_member);
-		pnUpdateGrid.add(new JLabel("club_room"));
+		pnUpdateGrid.add(update_club_room_check);
 		pnUpdateGrid.add(update_club_room);
-		pnUpdateGrid.add(new JLabel("professor_no"));
+		pnUpdateGrid.add(update_professor_no_check);
 		pnUpdateGrid.add(update_professor_no);
-		pnUpdateGrid.add(new JLabel("student_no"));
+		pnUpdateGrid.add(update_student_no_check);
 		pnUpdateGrid.add(update_student_no);
-		pnUpdateGrid.add(new JLabel("WHERE "));
+		pnUpdateGrid.add(update_where_check);
 		pnUpdateGrid.add(update_where);
 		pnUpdateGrid.add(new JLabel(""));
 		pnUpdateGrid.add(btnUpdate);
 		pnUpdate.add("North", new JLabel("UDATE club SET"));
 		pnUpdate.add("Center", pnUpdateGrid);
 		
-		/* 삭제 */
-		JPanel pnDeleteGrid = new JPanel();
-		pnDeleteGrid.setLayout(new GridLayout(8, 2, 5, 5));
-		JTextField delete_club_no = new JTextField();
-		JTextField delete_club_name = new JTextField();
-		JTextField delete_club_total_member = new JTextField();
-		JTextField delete_club_room = new JTextField();
-		JTextField delete_professor_no = new JTextField();
-		JTextField delete_student_no = new JTextField();
+		/* 삭제 */	
 		JTextField delete_where = new JTextField();
 		JButton btnDelete = new JButton("삭제");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {}
 		});
-		
-		pnDeleteGrid.add(new JLabel("club_no"));
-		pnDeleteGrid.add(delete_club_no);
-		pnDeleteGrid.add(new JLabel("club_name"));
-		pnDeleteGrid.add(delete_club_name);
-		pnDeleteGrid.add(new JLabel("club_total_member"));
-		pnDeleteGrid.add(delete_club_total_member);
-		pnDeleteGrid.add(new JLabel("club_room"));
-		pnDeleteGrid.add(delete_club_room);
-		pnDeleteGrid.add(new JLabel("studentprofessor_no_email"));
-		pnDeleteGrid.add(delete_professor_no);
-		pnDeleteGrid.add(new JLabel("student_no"));
-		pnDeleteGrid.add(delete_student_no);
-		pnDeleteGrid.add(new JLabel("WHERE "));
-		pnDeleteGrid.add(delete_where);
-		pnDeleteGrid.add(new JLabel(""));
-		pnDeleteGrid.add(btnDelete);
-		pnDelete.add("North", new JLabel("DELETE FROM club"));
-		pnDelete.add("Center", pnDeleteGrid);
+
+		pnDelete.add("North", new JLabel("DELETE FROM club WHERE"));
+		pnDelete.add("Center", delete_where);
+		pnDelete.add("South", btnDelete);
 
 		pnContent.add(pnInsert);
 		pnContent.add(pnUpdate);
@@ -3578,7 +3509,7 @@ public class JC19011458_19011461 extends JFrame {
 		c.remove(pnCenter);
 		pnCenter.removeAll();
 		pnCenter.add("North", pnHeader);
-		pnCenter.add("South", showTableClub());
+		pnCenter.add("South", showTableClubJoin());
 
 		JPanel pnContent = new JPanel();
 		pnContent.setLayout(new GridLayout(1, 3, 5, 5));
@@ -3633,27 +3564,16 @@ public class JC19011458_19011461 extends JFrame {
 		pnUpdate.add("Center", pnUpdateGrid);
 		
 		/* 삭제 */
-		JPanel pnDeleteGrid = new JPanel();
-		pnDeleteGrid.setLayout(new GridLayout(4, 2, 5, 5));
-		JTextField delete_club_no = new JTextField();
-		JTextField delete_student_no = new JTextField();
 		JTextField delete_where = new JTextField();
 		JButton btnDelete = new JButton("삭제");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {}
 		});
-		
-		pnDeleteGrid.add(new JLabel("club_no"));
-		pnDeleteGrid.add(delete_club_no);
-		pnDeleteGrid.add(new JLabel("student_no"));
-		pnDeleteGrid.add(delete_student_no);
-		pnDeleteGrid.add(new JLabel("WHERE "));
-		pnDeleteGrid.add(delete_where);
-		pnDeleteGrid.add(new JLabel(""));
-		pnDeleteGrid.add(btnDelete);
-		pnDelete.add("North", new JLabel("DELETE FROM club_join"));
-		pnDelete.add("Center", pnDeleteGrid);
 
+		pnDelete.add("North", new JLabel("DELETE FROM club_join WHERE"));
+		pnDelete.add("Center", delete_where);
+		pnDelete.add("South", btnDelete);
+		
 		pnContent.add(pnInsert);
 		pnContent.add(pnUpdate);
 		pnContent.add(pnDelete);
