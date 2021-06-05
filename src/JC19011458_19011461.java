@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class JC19011458_19011461 extends JFrame implements ActionListener {
+public class JC19011458_19011461 extends JFrame {
 
 	/* 수정 금지 */
 	static Connection con;
@@ -33,7 +33,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	JPanel pnSouth = new JPanel();
 
 	String userInfo = null;
-	String todayYear = "2021", todaySemester = "1";
+	String todayYear = "", todaySemester = "";
 	ImageIcon logoutIcon = new ImageIcon("images/exit-logout.png");
 	ImageIcon leftArrowIcon = new ImageIcon("images/left-arrow.png");
 
@@ -41,6 +41,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		super("JC19011458_19011461");
 		conDB();
 		layInit();
+		initYearAndSemester();
 		setVisible(true);
 		setSize(1920, 1040);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -816,7 +817,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		pnHeader.add("West", lbBackTracking);
 		pnHeader.add("Center", lbTitle);
 
-		String[] tableHeader = { "학번", "이름", "중간", "기말", "기타", "출석", "총점", "평점" };
+		String[] tableHeader = { "학번", "이름", "중간(30%)", "기말(40%)", "기타(20%)", "출석(10%)", "총점", "평점" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -873,8 +874,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.revalidate();
 		c.repaint();
 	}
-	public void modifyGrade(String lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model,
-			int row) {
+	public void modifyGrade(String lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model, int row) {
 		String studentNo = (String) model.getValueAt(row, 0);
 		String studentName = (String) model.getValueAt(row, 1);
 		String midtermScore = (String) model.getValueAt(row, 2);
@@ -907,13 +907,13 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		lbStudentNo.setHorizontalAlignment(JLabel.RIGHT);
 		JLabel lbStudentName = new JLabel("이름");
 		lbStudentName.setHorizontalAlignment(JLabel.RIGHT);
-		JLabel lbMidtermScore = new JLabel("중간고사");
+		JLabel lbMidtermScore = new JLabel("중간고사(30%)");
 		lbMidtermScore.setHorizontalAlignment(JLabel.RIGHT);
-		JLabel lbFinalScore = new JLabel("기말고사");
+		JLabel lbFinalScore = new JLabel("기말고사(40%)");
 		lbFinalScore.setHorizontalAlignment(JLabel.RIGHT);
-		JLabel lbOtherScore = new JLabel("기타");
+		JLabel lbOtherScore = new JLabel("기타(20%)");
 		lbOtherScore.setHorizontalAlignment(JLabel.RIGHT);
-		JLabel lbAttandence = new JLabel("출석");
+		JLabel lbAttandence = new JLabel("출석(10%)");
 		lbAttandence.setHorizontalAlignment(JLabel.RIGHT);
 		JLabel lbTotalScore = new JLabel("총점");
 		lbTotalScore.setHorizontalAlignment(JLabel.RIGHT);
@@ -921,30 +921,203 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		lbGrade.setHorizontalAlignment(JLabel.RIGHT);
 
 		JTextField tfStudentNo = new JTextField();
+		JTextField tfStudentName = new JTextField();
+		JTextField tfMidtermScore = new JTextField();
+		JTextField tfFinalsScore = new JTextField();
+		JTextField tfOtherScore = new JTextField();
+		JTextField tfAttandence = new JTextField();
+		JTextField tfTotalScore = new JTextField();
+		JTextField tfGrade = new JTextField();
+		
+		JPanel pnBtn = new JPanel();
+		JButton btnInput = new JButton("변경");
+		JButton btnCancel = new JButton("취소");
+
 		tfStudentNo.setText(studentNo);
 		tfStudentNo.setEditable(false);
-		JTextField tfStudentName = new JTextField();
+		
 		tfStudentName.setText(studentName);
 		tfStudentName.setEditable(false);
-		JTextField tfMidtermScore = new JTextField();
+		
 		tfMidtermScore.setText(midtermScore);
-		JTextField tfFinalsScore = new JTextField();
+		tfMidtermScore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 엔터 키 입력되면 버튼 활성화
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+			}
+			
+		});
+		tfMidtermScore.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				btnInput.setEnabled(false);
+				btnCancel.setEnabled(false);
+			}
+			public void focusLost(FocusEvent e) {
+				btnInput.setEnabled(true);
+				btnCancel.setEnabled(true);
+				try {
+					if (Double.parseDouble(tfMidtermScore.getText()) > 100.0) {
+						JOptionPane.showMessageDialog(null, "만점을 100점으로 환산하여 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+						tfMidtermScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfMidtermScore.requestFocus();
+						return;
+					}
+				} catch (NumberFormatException ex) {
+					if (!tfMidtermScore.getText().equals("")) {	// 빈칸이 아닌경우
+						JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+						tfMidtermScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfMidtermScore.requestFocus();
+						return;
+					}
+				}
+				tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+			}
+		});
+		
 		tfFinalsScore.setText(finalsScore);
-		JTextField tfOtherScore = new JTextField();
+		tfFinalsScore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 엔터 키 입력되면 버튼 활성화
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+			}
+			
+		});
+		tfFinalsScore.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				btnInput.setEnabled(false);
+				btnCancel.setEnabled(false);
+			}
+			public void focusLost(FocusEvent e) {
+				btnInput.setEnabled(true);
+				btnCancel.setEnabled(true);
+				try {
+					if (Double.parseDouble(tfFinalsScore.getText()) > 100.0) {
+						JOptionPane.showMessageDialog(null, "만점을 100점으로 환산하여 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+						tfFinalsScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfFinalsScore.requestFocus();
+						return;
+					}
+				} catch (NumberFormatException ex) {
+					if (!tfFinalsScore.getText().equals("")) {	// 빈칸이 아닌경우
+						JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+						tfFinalsScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfFinalsScore.requestFocus();
+						return;
+					}
+				}
+				tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+			}
+		});
+		
 		tfOtherScore.setText(otherScore);
-		JTextField tfAttandence = new JTextField();
+		tfOtherScore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 엔터 키 입력되면 버튼 활성화
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+			}
+			
+		});
+		tfOtherScore.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				btnInput.setEnabled(false);
+				btnCancel.setEnabled(false);
+			}
+			public void focusLost(FocusEvent e) {
+				btnInput.setEnabled(true);
+				btnCancel.setEnabled(true);
+				try {
+					if (Double.parseDouble(tfOtherScore.getText()) > 100.0) {
+						JOptionPane.showMessageDialog(null, "만점을 100점으로 환산하여 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+						tfOtherScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfOtherScore.requestFocus();
+						return;
+					}
+				} catch (NumberFormatException ex) {
+					if (!tfOtherScore.getText().equals("")) {	// 빈칸이 아닌경우
+						JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+						tfOtherScore.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfOtherScore.requestFocus();
+						return;
+					}
+				}
+				tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+			}
+		});
+		
 		tfAttandence.setText(attendanceScore);
-		JTextField tfTotalScore = new JTextField();
+		tfAttandence.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 엔터 키 입력되면 버튼 활성화
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+			}
+			
+		});
+		tfAttandence.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				btnInput.setEnabled(false);
+				btnCancel.setEnabled(false);
+			}
+			public void focusLost(FocusEvent e) {
+				btnInput.setEnabled(true);
+				btnCancel.setEnabled(true);
+				try {
+					if (Double.parseDouble(tfAttandence.getText()) > 100.0) {
+						JOptionPane.showMessageDialog(null, "만점을 100점으로 환산하여 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+						tfAttandence.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfAttandence.requestFocus();
+						return;
+					}
+				} catch (NumberFormatException ex) {
+					if (!tfAttandence.getText().equals("")) {	// 빈칸이 아닌경우
+						JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+						tfAttandence.setText("");
+						tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+						tfAttandence.requestFocus();
+						return;
+					}
+				}
+				tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
+			}
+		});
+		
 		tfTotalScore.setText(totalScore);
-		JTextField tfGrade = new JTextField();
+		tfTotalScore.setEditable(false);
 		tfGrade.setText(grade);
-
-		JPanel pnBtn = new JPanel();
+		tfGrade.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 엔터 키 입력되면 버튼 활성화
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+			}
+			
+		});
+		tfGrade.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				btnInput.setEnabled(false);
+				btnCancel.setEnabled(false);
+			}
+			public void focusLost(FocusEvent e) {
+				btnInput.setEnabled(true);
+				btnCancel.setEnabled(true);
+				if (!(tfGrade.getText().equals("A+") || tfGrade.getText().equals("A")|| tfGrade.getText().equals("B+")|| tfGrade.getText().equals("B")|| tfGrade.getText().equals("C+")|| tfGrade.getText().equals("C")|| tfGrade.equals("D+")|| tfGrade.getText().equals("D")|| tfGrade.getText().equals("F")|| tfGrade.getText().equals("FA")|| tfGrade.getText().equals("P")|| tfGrade.getText().equals("NP")||tfGrade.getText().equals(""))) {
+					JOptionPane.showMessageDialog(null, "평점을 확인해주세요.", "", JOptionPane.PLAIN_MESSAGE);
+					tfGrade.setText("");
+					tfGrade.requestFocus();
+				}
+			}
+		});
+		
 		pnBtn.setPreferredSize(new Dimension(430, 70));
-		JButton btnInput = new JButton("입력");
 		btnInput.setPreferredSize(new Dimension(200, 50));
 		btnInput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(), tfOtherScore.getText(), tfAttandence.getText()));
 				int result = JOptionPane.showConfirmDialog(null, "성적을 수정하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
 				if (result == JOptionPane.OK_OPTION) {
 					try {
@@ -964,7 +1137,6 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				}
 			}
 		});
-		JButton btnCancel = new JButton("취소");
 		btnCancel.setPreferredSize(new Dimension(200, 50));
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1124,7 +1296,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			rs = stmt.executeQuery(query);
 			ResultSet rs1;
 			while (rs.next()) {
-				String[] tableHeader = { "강의번호", "강의명", "중간고사", "기말고사", "기타점수", "출석", "총점", "평점" };
+				String[] tableHeader = { "강의번호", "강의명", "중간(30%)", "기말(40%)", "기타(20%)", "출석(10%)", "총점", "평점" };
 				String[][] tableContents = null;
 
 				/* 테이블 내용 - 해당학기 성적 */
@@ -1851,7 +2023,6 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 
 	}
-
 	public void studentGrade() {
 		c.remove(pnCenter);
 		pnCenter.removeAll();
@@ -1948,6 +2119,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	}
 
 	/* 공통 */
+	
+	/* 공통 */
 	public JLabel initBtnLogout() {
 		JLabel btnLogout = new JLabel(logoutIcon);
 		btnLogout.setHorizontalAlignment(JLabel.RIGHT);
@@ -1989,40 +2162,47 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 		return result;
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-//		try {
-//			stmt = con.createStatement();
-//			String query = "SELECT * FROM Book ";
-//			if (e.getSource() == btnAdmin) {
-//
-//			} else if (e.getSource() == btnProfessor) {
-//				loginProfessor();
-//			} else if (e.getSource() == btnStudent) {
-//				loginStudent();
-//			}
-//
-//	         if (e.getSource() == btnOk) {
-//	            txtResult.setText("");
-//	            txtResult.setText("BOOKNO           BOOK NAME       PUBLISHER      PRICE\n");
-//	            rs = stmt.executeQuery(query);
-//	            while (rs.next()) {
-//	               String str = rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getInt(4)
-//	                     + "\n";
-//	               txtResult.append(str);
-//	            }
-//	         } else if (e.getSource() == btnReset) {
-//	            txtResult.setText("");
-//	         }
-//		} catch (Exception e2) {
-//			System.out.println("쿼리 읽기 실패 :" + e2);
-//			/*
-//			 * } finally { try { if (rs != null) rs.close(); if (stmt != null) stmt.close();
-//			 * if (con != null) con.close(); } catch (Exception e3) { // TODO: handle
-//			 * exception }
-//			 */
-//		}
+	public void initYearAndSemester() {
+		Date now = new Date();
+		SimpleDateFormat yearFormat = new SimpleDateFormat("YYYY");
+		SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+		int year = Integer.parseInt(yearFormat.format(now));
+		int month = Integer.parseInt(monthFormat.format(now));
+		if (month == 1) {	// 1월
+			todayYear =  Integer.toString(year-1);
+			todaySemester = "2";
+		} else if(month > 1 && month < 8) {	//2, 3, ,4, 5, 6, 7
+			todayYear =  Integer.toString(year);
+			todaySemester = "1";
+		} else {	// 8, 9, 10, 11, 12
+			todayYear =  Integer.toString(year);
+			todaySemester = "2";
+		}
+	}
+	public String calculateTotalScore(String midtermStr, String FinalsStr, String OtherStr, String AttandenceStr) {
+		double midterm, finals, other, attendance;
+		if (midtermStr.equals("")) {
+			midterm = 0;
+		} else {
+			midterm = Double.parseDouble(midtermStr);
+		}
+		if (FinalsStr.equals("")) {
+			finals = 0;
+		} else {
+			finals = Double.parseDouble(FinalsStr);
+		}
+		if (OtherStr.equals("")) {
+			other = 0;
+		} else {
+			other = Double.parseDouble(OtherStr);
+		}
+		if (AttandenceStr.equals("")) {
+			attendance = 0;
+		} else {
+			attendance = Double.parseDouble(AttandenceStr);
+		}
+		
+		return Double.toString(midterm * 0.3 + finals * 0.4+ other * 0.2 + attendance * 0.1);
 	}
 
 	public static void main(String[] args) {
