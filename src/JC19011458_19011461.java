@@ -33,7 +33,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 	JPanel pnSouth = new JPanel();
 
 	String userInfo = null;
-	String todayYear = "2020", todaySemester = "1";
+	String todayYear = "2021", todaySemester = "1";
 	ImageIcon logoutIcon = new ImageIcon("images/exit-logout.png");
 	ImageIcon leftArrowIcon = new ImageIcon("images/left-arrow.png");
 
@@ -189,13 +189,12 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 	}
 
-
 	public void adminEntire() {
-		//교수, 학과, 교수 소속, 강좌, 학생, 등록, 지도관계, 수강, 동아리, 동아리원
+		// 교수, 학과, 교수 소속, 강좌, 학생, 등록, 지도관계, 수강, 동아리, 동아리원
 		c.remove(pnCenter);
 		pnCenter.removeAll();
 		pnCenter.setLayout(new BorderLayout());
-		
+
 		/* 헤더 */
 		JPanel pnHeader = new JPanel();
 		pnHeader.setLayout(new BorderLayout());
@@ -214,7 +213,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JButton btnCourse = new JButton("수강");
 		JButton btnClub = new JButton("동아리");
 		JButton btnClubJoin = new JButton("동아리원");
-		
+
 		btnProfessor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pnCenter.removeAll();
@@ -223,7 +222,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnDepartment.addActionListener(new ActionListener() {
@@ -234,7 +233,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnAffiliatedProfessor.addActionListener(new ActionListener() {
@@ -245,7 +244,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnLecture.addActionListener(new ActionListener() {
@@ -256,7 +255,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnStudent.addActionListener(new ActionListener() {
@@ -267,7 +266,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnTuition.addActionListener(new ActionListener() {
@@ -278,7 +277,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnTutoring.addActionListener(new ActionListener() {
@@ -289,7 +288,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnCourse.addActionListener(new ActionListener() {
@@ -300,7 +299,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnClub.addActionListener(new ActionListener() {
@@ -311,7 +310,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
 		btnClubJoin.addActionListener(new ActionListener() {
@@ -322,10 +321,10 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
 				c.revalidate();
-				//c.repaint();
+				// c.repaint();
 			}
 		});
-		
+
 		pnBtn.add(btnProfessor);
 		pnBtn.add(btnDepartment);
 		pnBtn.add(btnAffiliatedProfessor);
@@ -336,23 +335,21 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		pnBtn.add(btnCourse);
 		pnBtn.add(btnClub);
 		pnBtn.add(btnClubJoin);
-		
+
 		pnHeader.add("Center", lbTitle);
 		pnHeader.add("East", pnBtn);
-		
-
 
 		pnCenter.add("North", pnHeader);
 //		pnCenter.add("Center", pnContent);
 		c.add("Center", pnCenter);
 		c.revalidate();
 		c.repaint();
-		}
+	}
 
 	public void adminAdministration() {
-		
+
 	}
-	
+
 	public void adminInitDB() {
 		c.remove(pnCenter);
 		pnCenter.removeAll();
@@ -385,7 +382,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.remove(pnCenter);
 		pnCenter.removeAll();
 		pnCenter.setLayout(new BorderLayout());
-		
+
 		/* 헤더 */
 		JPanel pnHeader = new JPanel();
 		pnHeader.setLayout(new BorderLayout());
@@ -395,52 +392,60 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 		JPanel pnBtn = new JPanel();
 		JButton btnSetYearSemester = new JButton("학년/학기 설정");
-		
+
 		btnSetYearSemester.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pnCenter.removeAll();
 				pnCenter.add("North", pnHeader);
-				
+
 				/* 내용 */
 				JLabel lbYear = new JLabel("연도");
 				JTextField year = new JTextField();
 				JLabel lbSemester = new JLabel("학기");
 				JTextField semester = new JTextField();
 				JButton btn = new JButton("변경");
-				
+
 				lbYear.setHorizontalAlignment(JLabel.CENTER);
-				year.setPreferredSize(new Dimension(200,40));
+				year.setPreferredSize(new Dimension(200, 40));
 				year.setText(todayYear);
 				year.addKeyListener(new KeyListener() {
-					public void keyTyped(KeyEvent e) {}
-					public void keyPressed(KeyEvent e) {}
-				    public void keyReleased(KeyEvent e) {
+					public void keyTyped(KeyEvent e) {
+					}
+
+					public void keyPressed(KeyEvent e) {
+					}
+
+					public void keyReleased(KeyEvent e) {
 						if (!year.getText().equals(todayYear)) {
 							btn.setEnabled(true);
 						}
-				    }
+					}
 				});
-				
+
 				lbSemester.setHorizontalAlignment(JLabel.CENTER);
-				semester.setPreferredSize(new Dimension(200,40));
+				semester.setPreferredSize(new Dimension(200, 40));
 				semester.setText(todaySemester);
 				semester.addKeyListener(new KeyListener() {
-					public void keyTyped(KeyEvent e) {}
-					public void keyPressed(KeyEvent e) {}
-				    public void keyReleased(KeyEvent e) {
+					public void keyTyped(KeyEvent e) {
+					}
+
+					public void keyPressed(KeyEvent e) {
+					}
+
+					public void keyReleased(KeyEvent e) {
 						if (!semester.getText().equals(todaySemester)) {
 							btn.setEnabled(true);
 						}
-				    }
+					}
 				});
-				
-				btn.setPreferredSize(new Dimension(60,40));
+
+				btn.setPreferredSize(new Dimension(60, 40));
 				btn.setEnabled(false);
 				btn.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						try {
 							Integer.parseInt(year.getText());
-						} catch(NumberFormatException ex) {
+						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
 							year.setText("");
 							year.requestFocus();
@@ -448,7 +453,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 						}
 						try {
 							Integer.parseInt(semester.getText());
-						} catch(NumberFormatException ex) {
+						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
 							semester.setText("");
 							semester.requestFocus();
@@ -460,23 +465,25 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 							return;
 						}
 						if (!semester.getText().equals("1") && !semester.getText().equals("2")) {
-							JOptionPane.showMessageDialog(null, "학기는 '1' 또는 '2'만 입력 가능합니다.", "", JOptionPane.PLAIN_MESSAGE);
+							JOptionPane.showMessageDialog(null, "학기는 '1' 또는 '2'만 입력 가능합니다.", "",
+									JOptionPane.PLAIN_MESSAGE);
 							semester.requestFocus();
 							return;
 						}
-						
-						int result = JOptionPane.showConfirmDialog(null, "연도/학기를 수정하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+
+						int result = JOptionPane.showConfirmDialog(null, "연도/학기를 수정하시겠습니까?", "",
+								JOptionPane.OK_CANCEL_OPTION);
 						if (result == JOptionPane.OK_OPTION) {
 							todayYear = year.getText().replace(" ", "");
 							todaySemester = semester.getText();
 							JOptionPane.showMessageDialog(null, "수정되었습니다.", "", JOptionPane.PLAIN_MESSAGE);
 							btnSetYearSemester.doClick();
 						} else if (result == JOptionPane.CANCEL_OPTION) {
-							
+
 						}
 					}
 				});
-			
+
 				JPanel pnForm = new JPanel();
 				pnForm.add(lbYear);
 				pnForm.add(year);
@@ -484,13 +491,15 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				pnForm.add(semester);
 				pnForm.add(new JLabel(""));
 				pnForm.add(btn);
-				
+
 				JPanel pnContent = new JPanel();
-				pnContent.setLayout(new GridLayout(3,1,10,10));
-				pnContent.add(new JLabel(""));
+				JLabel notice = new JLabel("변경된 값은 프로그램이 종료되면 초기화됩니다.");
+				notice.setHorizontalAlignment(JLabel.CENTER);
+				pnContent.setLayout(new GridLayout(3, 1, 10, 10));
+				pnContent.add(notice);
 				pnContent.add(pnForm);
 				pnContent.add(new JLabel(""));
-				
+
 				pnCenter.add("Center", pnContent);
 				c.remove(pnCenter);
 				c.add("Center", pnCenter);
@@ -498,7 +507,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 				c.repaint();
 			}
 		});
-		
+
 		pnBtn.add(btnSetYearSemester);
 		pnHeader.add("Center", lbTitle);
 		pnHeader.add("East", pnBtn);
@@ -507,7 +516,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.revalidate();
 		c.repaint();
 	}
-	
+
 	/* 교수 */
 	public void professorLogin() {
 		c.removeAll();
@@ -720,11 +729,11 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.repaint();
 	}
 
-	public JPanel findLectureByProfessor(String lectureYear, String lectureSemester) {
-		JPanel pnContent = new JPanel();
-//		pnContent.setLayout(new GridLayout(5, 2, 10, 10));
-		pnContent.setBackground(Color.DARK_GRAY);
+	public JScrollPane findLectureByProfessor(String lectureYear, String lectureSemester) {
 
+		String[] tableHeader = { "강의번호", "강좌이름", "담당교수", "시간표", "취득학점", "강좌시간", "강의실", "개설학과" };
+		String[][] tableContents = null;
+		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
 			stmt = con.createStatement();
 			String query = "SELECT l.lecture_no, l.lecture_class_no, l.lecture_name, p.professor_name, l.lecture_day1, l.lecture_period1, l.lecture_day2, l.lecture_period2, l.lecture_credit, l.lecture_time, l.lecture_room, d.department_name\r\n"
@@ -734,43 +743,52 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 					+ lectureSemester;
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				int lectureNo = rs.getInt(1);
-				String str = "강의번호\t" + rs.getInt(1) + " - " + rs.getInt(2) + "\n강좌이름\t" + rs.getString(3) + "\n담당교수\t"
-						+ rs.getString(4);
-				if (!rs.getString(7).equals("")) {
-					str += "\n시간표\t" + rs.getString(5) + " : " + rs.getString(6) + " / " + rs.getString(7) + " : "
-							+ rs.getString(8);
-				} else {
-					str += "\n시간표\t" + rs.getString(5) + " : " + rs.getString(6) + " ";
+				String time = "";
+				if(!rs.getString(5).equals("")) {
+					if(rs.getString(5).equals(rs.getString(7))) {
+						time += rs.getString(5) + rs.getString(7) + mapTime(rs.getString(6));
+					}
+					else {
+						time = rs.getString(5) + mapTime(rs.getString(6));
+						if(!rs.getString(7).equals(("")))
+							time += "," + rs.getString(7) + mapTime(rs.getString(8));
+				 	}
 				}
-				str += "\n취득학점\t" + rs.getInt(9) + "학점" + "\n강좌시간\t" + rs.getString(10) + "\n강의실\t" + rs.getString(11)
-						+ "\n개설학과\t" + rs.getString(12);
-
-				JTextArea lectureInfo = new JTextArea(str);
-				lectureInfo.setEditable(false);
-				// lectureInfo.setPreferredSize(new Dimension(450, 350));
-				lectureInfo.setSize(450, 350);
-				lectureInfo.addMouseListener(new MouseAdapter() {
-					public void mouseClicked(MouseEvent e) {
-						professorLectureStudents(lectureNo, lectureYear, lectureSemester);
-					}
-
-					public void mouseEntered(MouseEvent e) {
-						lectureInfo.setCursor(new Cursor(Cursor.HAND_CURSOR));
-					}
-				});
-				// lectureInfo.setOpaque(true); // Opaque값을 true로 미리 설정해 주어야 배경색이 적용된다.
-				// lectureInfo.setBackground(Color.WHITE);
-				pnContent.add(lectureInfo);
+				String[] str = { rs.getInt(1) + " - " + rs.getInt(2), rs.getString(3), rs.getString(4), time, rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12) };
+				strList.add(str);
 			}
+			tableContents = new String[strList.size()][];
+			strList.toArray(tableContents);
 		} catch (SQLException e) {
 			System.out.println("쿼리 읽기 실패 :" + e);
 		}
+		DefaultTableModel model = new DefaultTableModel(tableContents, tableHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		JTable lectureInfo = new JTable(model);
+		lectureInfo.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
+		// studentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
+		lectureInfo.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				String[] lectureNo = ((String) model.getValueAt(lectureInfo.getSelectedRow(), 0)).trim().split("-");
+				professorLectureStudents(lectureNo[0], lectureYear, lectureSemester);
+			}
+
+			public void mouseEntered(MouseEvent e) {
+				lectureInfo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+		});
+		lectureInfo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+
+		JScrollPane pnContent = new JScrollPane(lectureInfo);
+		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		return pnContent;
 	}
 
-	public void professorLectureStudents(int lectureNo, String lectureYear, String lectureSemester) {
+	public void professorLectureStudents(String lectureNo, String lectureYear, String lectureSemester) {
 		c.remove(pnCenter);
 		pnCenter.removeAll();
 		pnCenter.setLayout(new BorderLayout());
@@ -855,8 +873,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		c.revalidate();
 		c.repaint();
 	}
-
-	public void modifyGrade(int lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model,
+	public void modifyGrade(String lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model,
 			int row) {
 		String studentNo = (String) model.getValueAt(row, 0);
 		String studentName = (String) model.getValueAt(row, 1);
@@ -1628,7 +1645,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "select l.lecture_name, l.lecture_day1, l.lecture_period1, l.lecture_day2, l.lecture_period2, l.lecture_room\r\n"
 					+ "from lecture l, course c\r\n" + "where l.lecture_no = c.lecture_no and c.student_no = "
 					+ userInfo;
-			query += " and l.lecture_year = 2021 and l.lecture_semester = 1 ";
+			query += " and l.lecture_year = " + todayYear + " and l.lecture_semester = " + todaySemester;
 			rs = stmt.executeQuery(query);
 
 			String name, day, room, subject;
@@ -1749,13 +1766,6 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 					}
 				}
 
-//				public void mousePressed(MouseEvent e) {
-//					int row = clubtable.getSelectedRow();
-//					if (president.contains(row)) {
-//						showClubStudent(clubtable.getValueAt(row, 0));
-//					}
-//				}
-
 				private void showClubStudent(Object valueAt) {
 					c.remove(pnCenter);
 					pnCenter.removeAll();
@@ -1865,7 +1875,7 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			stmt = con.createStatement();
 			String query = "select l.lecture_no, l.lecture_name, l.lecture_credit, c.grade\r\n"
 					+ "from lecture l, course c\r\n"
-					+ "where l.lecture_no = c.lecture_no and not(l.lecture_year = 2021 and l.lecture_semester = 1)\r\n"
+					+ "where l.lecture_no = c.lecture_no and not(l.lecture_year >= " + todayYear + " and l.lecture_semester >= " + todaySemester + " )\r\n"
 					+ "and c.student_no = " + userInfo;
 			rs = stmt.executeQuery(query);
 
@@ -1876,8 +1886,11 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			for (int i = 0; i < columns_list.length; i++)
 				columns.add(columns_list[i]);
 			Double GPA = 0.0;
-			Integer gradeCredit = 0;
-			Integer totalCredit = 0;
+			
+			Integer getCredit = 0; //취득학점 <8, ==10
+			Integer gradeCredit = 0; //GPA반영학점 < 10
+			Integer totalCredit = 0; //신청학점
+		
 			while (rs.next()) {
 				Vector<String> tmp = new Vector<String>();
 				tmp.add(rs.getString(1));
@@ -1887,13 +1900,21 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 				int credit = Integer.parseInt(rs.getString(3)); // 학점
 				int idx = grade.indexOf(rs.getString(4)); // 등급
-				if (idx < 10) {
+				
+				totalCredit += credit;
+				if (idx < 10) { 
+					gradeCredit += credit;
 					tmp.add(Double.toString(gradepoints[idx]));
 					GPA += gradepoints[idx] * (1.0 * credit);
-					gradeCredit += credit;
-					totalCredit += credit;
-				} else if (idx == 10) // p
-					totalCredit += credit;
+					
+					if(idx < 8) {
+						getCredit += credit;
+					}
+					
+				} else if (idx == 10) {// p
+					getCredit += credit;
+				}
+				
 
 				contents.add(tmp);
 			}
@@ -1902,13 +1923,13 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			GPA = Math.round(GPA * 100) / 100.0;
 			JLabel gradeinfo = new JLabel("<HTML><div style=\\\"text-align:right\\\">취득학점 : " + totalCredit
 					+ "<br /><br />GPA :" + GPA + "</div></HTML>");
-			gradeinfo.setHorizontalAlignment(JLabel.RIGHT);
+			gradeinfo.setHorizontalAlignment(JLabel.LEFT);
 			
 			JTable gradetable = new JTable(contents, columns);
 			gradetable.setEnabled(false);
 			
 			JScrollPane scrollpane = new JScrollPane(gradetable);
-			scrollpane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "<HTML><div style=\\\"text-align:right\\\">취득학점 : " + totalCredit + "<br />GPA : " + GPA + "</div></HTML>", TitledBorder.RIGHT, TitledBorder.TOP, new Font("times new roman", Font.PLAIN, 15), Color.RED));
+			scrollpane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "<HTML><div style=\\\"text-align:left\\\">신청학점 : " + totalCredit +  "<br />취득학점 : " + getCredit + "<br />GPA : " + GPA + "</div></HTML>", TitledBorder.LEFT, TitledBorder.TOP, new Font("times new roman", Font.PLAIN, 15), Color.RED));
 			pnCenter.add("Center", scrollpane);
 			
 			//pnHeader.add("South", gradeinfo);
@@ -1969,7 +1990,6 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		return result;
 	}
 
-	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 //		try {
@@ -2024,11 +2044,11 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 
 	}
 
-
 	// DB 테이블 반환
 	public JScrollPane showTableProfessor() {
 		/* 내용 */
-		String[] tableHeader = { "professor_no", "professor_name", "professor_address", "professor_phone", "professor_email" };
+		String[] tableHeader = { "professor_no", "professor_name", "professor_address", "professor_phone",
+				"professor_email" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2054,16 +2074,19 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+
 		return pnContent;
 	}
+
 	public JScrollPane showTableDepartment() {
 		/* 내용 */
-		String[] tableHeader = { "department_no", "department_name", "department_contact", "department_office", "professor_no" };
+		String[] tableHeader = { "department_no", "department_name", "department_contact", "department_office",
+				"professor_no" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2089,12 +2112,14 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableAffiliatedProfessor() {
 		/* 내용 */
 		String[] tableHeader = { "professor_no", "department_no" };
@@ -2123,15 +2148,19 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableLecture() {
 		/* 내용 */
-		String[] tableHeader = { "lecture_no", "lecture_class_no", "lecture_name", "lecture_day1", "lecture_period1", "lecture_day2", "lecture_period2", "lecture_credit", "lecture_time", "lecture_room", "department_no", "professor_no", "lecture_year", "lecture_semester" };
+		String[] tableHeader = { "lecture_no", "lecture_class_no", "lecture_name", "lecture_day1", "lecture_period1",
+				"lecture_day2", "lecture_period2", "lecture_credit", "lecture_time", "lecture_room", "department_no",
+				"professor_no", "lecture_year", "lecture_semester" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2139,7 +2168,9 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "SELECT lecture_no, lecture_class_no, lecture_name, lecture_day1, lecture_period1, lecture_day2, lecture_period2, lecture_credit, lecture_time, lecture_room, department_no, professor_no, lecture_year, lecture_semester FROM lecture";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12), rs.getString(13), rs.getString(14) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
+						rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getString(10),
+						rs.getString(11), rs.getString(12), rs.getString(13), rs.getString(14) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -2157,15 +2188,18 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableStudent() {
 		/* 내용 */
-		String[] tableHeader = { "student_no", "student_name", "student_address", "student_phone", "student_email", "student_account", "major_no", "minor_no" };
+		String[] tableHeader = { "student_no", "student_name", "student_address", "student_phone", "student_email",
+				"student_account", "major_no", "minor_no" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2173,7 +2207,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "SELECT student_no, student_name, student_address, student_phone, student_email, student_account, major_no, minor_no FROM student";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
+						rs.getString(6), rs.getString(7), rs.getString(8) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -2191,15 +2226,18 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableTuition() {
 		/* 내용 */
-		String[] tableHeader = { "student_no", "tuition_year", "tuition_semester", "tuition_fee", "tuition_payment", "last_payment_date", "grade_semester" };
+		String[] tableHeader = { "student_no", "tuition_year", "tuition_semester", "tuition_fee", "tuition_payment",
+				"last_payment_date", "grade_semester" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2207,7 +2245,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "SELECT student_no, tuition_year, tuition_semester, tuition_fee, tuition_payment, last_payment_date, grade_semester FROM tuition ORDER BY tuition_year DESC, tuition_semester DESC, student_no";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
+						rs.getString(6), rs.getString(7) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -2225,12 +2264,14 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableTutoring() {
 		/* 내용 */
 		String[] tableHeader = { "student_no", "professor_no", "grade_semester" };
@@ -2259,15 +2300,18 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableCourse() {
 		/* 내용 */
-		String[] tableHeader = { "lecture_no", "student_no", "midterm_score", "finals_score", "other_score", "attendance_score", "total_score", "grade" };
+		String[] tableHeader = { "lecture_no", "student_no", "midterm_score", "finals_score", "other_score",
+				"attendance_score", "total_score", "grade" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2275,7 +2319,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "SELECT lecture_no, student_no, midterm_score, finals_score, other_score, attendance_score, total_score, grade FROM course";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
+						rs.getString(6), rs.getString(7), rs.getString(8) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -2293,15 +2338,18 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableClub() {
 		/* 내용 */
-		String[] tableHeader = { "club_no", "club_name", "club_room", "professor_no", "student_no", "club_total_member" };
+		String[] tableHeader = { "club_no", "club_name", "club_room", "professor_no", "student_no",
+				"club_total_member" };
 		String[][] tableContents = null;
 		ArrayList<String[]> strList = new ArrayList<String[]>();
 		try {
@@ -2309,7 +2357,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 			String query = "SELECT club_no, club_name, club_room, professor_no, student_no, club_total_member FROM club";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6) };
+				String[] str = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5),
+						rs.getString(6) };
 				strList.add(str);
 			}
 			tableContents = new String[strList.size()][];
@@ -2327,12 +2376,14 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		return pnContent;
 	}
+
 	public JScrollPane showTableClubJoin() {
 		/* 내용 */
 		String[] tableHeader = { "club_no", "student_no" };
@@ -2361,7 +2412,8 @@ public class JC19011458_19011461 extends JFrame implements ActionListener {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // 컬럼들 이동 불가
 		// departmentTable.getTableHeader().setResizingAllowed(false); // 컬럼 크기 조절 불가
-		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러 행 선택 불가
+		// departmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 여러
+		// 행 선택 불가
 
 		JScrollPane pnContent = new JScrollPane(table);
 		pnContent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
