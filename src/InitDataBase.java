@@ -9,96 +9,96 @@ public class InitDataBase {
 			stmt.execute("commit");
 			stmt.execute("USE madang");
 
-			stmt.execute("CREATE TABLE IF NOT EXISTS professor (\r\n" + 
-						"	professor_no INT NOT NULL PRIMARY KEY,\r\n" + 
-						"	professor_name VARCHAR(45) NOT NULL,\r\n" + 
-						"	professor_address VARCHAR(45) NOT NULL,\r\n" + 
-						"	professor_phone VARCHAR(45) NOT NULL,\r\n" + 
-						"	professor_email VARCHAR(45) NOT NULL)");
-			stmt.execute("CREATE TABLE IF NOT EXISTS department (\r\n" + 
-					"	department_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"	department_name VARCHAR(45) NOT NULL,\r\n" + 
-					"	department_contact VARCHAR(45) NOT NULL,\r\n" + 
-					"	department_office VARCHAR(45) NOT NULL,\r\n" + 
-					"	professor_no INT NOT NULL,\r\n" + 
-					"	FOREIGN KEY(professor_no) REFERENCES professor (professor_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS affiliated_professor (\r\n" + 
-					"	professor_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"	department_no INT NOT NULL,\r\n" + 
-					"	FOREIGN KEY(professor_no) REFERENCES professor (professor_no),\r\n" + 
-					"	FOREIGN KEY(department_no) REFERENCES department (department_no)\r\n" + 
-					")");
-			stmt.execute("CREATE TABLE IF NOT EXISTS student (\r\n" + 
-					"	student_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"	student_name VARCHAR(45) NOT NULL,\r\n" + 
-					"	student_address VARCHAR(45) NOT NULL,\r\n" + 
-					"	student_phone VARCHAR(45) NOT NULL,\r\n" + 
-					"	student_email VARCHAR(45) NOT NULL,\r\n" + 
-					"	student_account VARCHAR(45) NOT NULL,\r\n" + 
-					"	major_no INT NOT NULL,\r\n" + 
-					"	minor_no INT NULL,\r\n" + 
-					"	FOREIGN KEY(major_no) REFERENCES department (department_no),\r\n" + 
-					"    FOREIGN KEY(minor_no) REFERENCES department (department_no))");
-			stmt.execute(				"CREATE TABLE IF NOT EXISTS tuition (\r\n" + 
-					"	student_no INT NOT NULL,\r\n" + 
-					"	tuition_year INT NOT NULL,\r\n" + 
-					"	tuition_semester INT NOT NULL,\r\n" + 
-					"	tuition_fee INT NOT NULL,\r\n" + 
-					"	tuition_payment INT NOT NULL,\r\n" + 
-					"	last_payment_date VARCHAR(11) NULL,\r\n" + 
-					"	grade_semester VARCHAR(45) NOT NULL,\r\n" + 
-					"	PRIMARY KEY (student_no, tuition_year, tuition_semester),\r\n" + 
-					"	FOREIGN KEY(student_no) REFERENCES student (student_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS tutoring (\r\n" + 
-					"  student_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"  professor_no INT NOT NULL,\r\n" + 
-					"  grade_semester VARCHAR(45) NOT NULL,\r\n" + 
-					"  FOREIGN KEY(student_no) REFERENCES student (student_no),\r\n" + 
-					"  FOREIGN KEY(professor_no) REFERENCES professor (professor_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS club (\r\n" + 
-					"	club_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"	club_name VARCHAR(45) NOT NULL,\r\n" + 
-					"	club_total_member INT NOT NULL,\r\n" + 
-					"	club_room VARCHAR(45) NOT NULL,\r\n" + 
-					"	professor_no INT NOT NULL,\r\n" + 
-					"	student_no INT NOT NULL,\r\n" + 
-					"	FOREIGN KEY(professor_no) REFERENCES professor (professor_no),\r\n" + 
-					"	FOREIGN KEY(student_no) REFERENCES student (student_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS club_join (\r\n" + 
-					"	student_no INT NOT NULL,\r\n" + 
-					"	club_no INT NOT NULL,\r\n" + 
-					"	PRIMARY KEY (student_no, club_no),\r\n" + 
-					"	FOREIGN KEY(student_no) REFERENCES student (student_no),\r\n" + 
-					"    FOREIGN KEY(club_no) REFERENCES club (club_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS lecture (\r\n" + 
-					"	lecture_no INT NOT NULL PRIMARY KEY,\r\n" + 
-					"	lecture_class_no INT NOT NULL,\r\n" + 
-					"	lecture_name VARCHAR(45) NOT NULL,\r\n" + 
-					"	lecture_day1 VARCHAR(45) NULL,\r\n" + 
-					"	lecture_period1 VARCHAR(45) NULL,\r\n" + 
-					"	lecture_day2 VARCHAR(45) NULL,\r\n" + 
-					"	lecture_period2 VARCHAR(45) NULL,\r\n" + 
-					"	lecture_credit INT NOT NULL,\r\n" + 
-					"	lecture_time INT NOT NULL,\r\n" + 
-					"	lecture_room VARCHAR(45) NOT NULL,\r\n" + 
-					"    department_no INT NOT NULL,\r\n" + 
-					"    professor_no INT NOT NULL,\r\n" + 
-					"	lecture_year INT NULL,\r\n" + 
-					"	lecture_semester INT NULL,\r\n" + 
-					"	FOREIGN KEY(professor_no) REFERENCES professor (professor_no),\r\n" + 
-					"    FOREIGN KEY(department_no) REFERENCES department (department_no))");
-			stmt.execute("CREATE TABLE IF NOT EXISTS course (\r\n" + 
-					"	lecture_no INT NOT NULL,\r\n" + 
-					"	student_no INT NOT NULL,\r\n" + 
-					"	attendance_score INT NULL,\r\n" + 
-					"	midterm_score INT NULL,\r\n" + 
-					"	finals_score INT NULL,\r\n" + 
-					"	other_score INT NULL,\r\n" + 
-					"    total_score INT NULL,\r\n" + 
-					"	grade VARCHAR(2) NULL,\r\n" + 
-					"    PRIMARY KEY (lecture_no, student_no),\r\n" + 
-					"	FOREIGN KEY(lecture_no) REFERENCES lecture (lecture_no),\r\n" + 
-					"	FOREIGN KEY(student_no) REFERENCES student (student_no))");
+			stmt.execute("CREATE TABLE IF NOT EXISTS professor ( \r\n"
+					+ "	professor_no INT NOT NULL PRIMARY KEY,\r\n"
+					+ "	professor_name VARCHAR(45) NOT NULL,\r\n"
+					+ "	professor_address VARCHAR(45) NOT NULL,\r\n"
+					+ "	professor_phone VARCHAR(45) NOT NULL,\r\n"
+					+ "	professor_email VARCHAR(45) NOT NULL)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS department (\r\n"
+					+ "	department_no INT NOT NULL PRIMARY KEY,\r\n"
+					+ "	department_name VARCHAR(45) NOT NULL,\r\n"
+					+ "	department_contact VARCHAR(45) NOT NULL,\r\n"
+					+ "	department_office VARCHAR(45) NOT NULL,\r\n"
+					+ "	professor_no INT NOT NULL,\r\n"
+					+ "	FOREIGN KEY(professor_no) REFERENCES professor (professor_no) ON DELETE CASCADE ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS affiliated_professor (\r\n"
+					+ "	professor_no INT NOT NULL,\r\n"
+					+ "	department_no INT NOT NULL,\r\n"
+					+ " PRIMARY KEY (professor_no, department_no),\r\n"
+					+ "	FOREIGN KEY(professor_no) REFERENCES professor (professor_no) ON DELETE CASCADE ON UPDATE CASCADE,\r\n"
+					+ "	FOREIGN KEY(department_no) REFERENCES department (department_no) ON DELETE CASCADE ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS student (\r\n"
+					+ "	student_no INT NOT NULL PRIMARY KEY,\r\n"
+					+ "	student_name VARCHAR(45) NOT NULL,\r\n"
+					+ "	student_address VARCHAR(45) NOT NULL,\r\n"
+					+ "	student_phone VARCHAR(45) NOT NULL,\r\n"
+					+ "	student_email VARCHAR(45) NOT NULL,\r\n"
+					+ "	student_account VARCHAR(45) NOT NULL,\r\n"
+					+ "	major_no INT NOT NULL,\r\n"
+					+ "	minor_no INT NULL,\r\n"
+					+ "	FOREIGN KEY(major_no) REFERENCES department (department_no) ON DELETE RESTRICT ON UPDATE CASCADE,\r\n"
+					+ " FOREIGN KEY(minor_no) REFERENCES department (department_no) ON DELETE RESTRICT ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS tuition (\r\n"
+					+ "	student_no INT NOT NULL,\r\n"
+					+ "	tuition_year INT NOT NULL,\r\n"
+					+ "	tuition_semester INT NOT NULL,\r\n"
+					+ "	tuition_fee INT NOT NULL,\r\n"
+					+ "	tuition_payment INT NOT NULL,\r\n"
+					+ "	last_payment_date VARCHAR(11) NULL,\r\n"
+					+ "	grade_semester VARCHAR(45) NOT NULL,\r\n"
+					+ "	PRIMARY KEY (student_no, tuition_year, tuition_semester),\r\n"
+					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE CASCADE ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS tutoring (\r\n"
+					+ "  student_no INT NOT NULL  PRIMARY KEY,\r\n"
+					+ "  professor_no INT NOT NULL,\r\n"
+					+ "  grade_semester VARCHAR(45) NOT NULL,\r\n"
+					+ "  FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE CASCADE ON UPDATE CASCADE,\r\n"
+					+ "  FOREIGN KEY(professor_no) REFERENCES professor (professor_no) ON DELETE RESTRICT ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS club (\r\n"
+					+ "	club_no INT NOT NULL PRIMARY KEY,\r\n"
+					+ "	club_name VARCHAR(45) NOT NULL,\r\n"
+					+ "	club_total_member INT NOT NULL,\r\n"
+					+ "	club_room VARCHAR(45) NOT NULL,\r\n"
+					+ "	professor_no INT NOT NULL,\r\n"
+					+ "	student_no INT NOT NULL,\r\n"
+					+ "	FOREIGN KEY(professor_no) REFERENCES professor (professor_no) ON DELETE RESTRICT ON UPDATE CASCADE,\r\n"
+					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE RESTRICT ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS club_join (\r\n"
+					+ "	student_no INT NOT NULL,\r\n"
+					+ "	club_no INT NOT NULL,\r\n"
+					+ "	PRIMARY KEY (student_no, club_no),\r\n"
+					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE CASCADE ON UPDATE CASCADE,\r\n"
+					+ "	FOREIGN KEY(club_no) REFERENCES club (club_no) ON DELETE CASCADE ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS lecture (\r\n"
+					+ "	lecture_no INT NOT NULL PRIMARY KEY,\r\n"
+					+ "	lecture_class_no INT NOT NULL,\r\n"
+					+ "	lecture_name VARCHAR(45) NOT NULL,\r\n"
+					+ "	lecture_day1 VARCHAR(45) NULL,\r\n"
+					+ "	lecture_period1 VARCHAR(45) NULL,\r\n"
+					+ "	lecture_day2 VARCHAR(45) NULL,\r\n"
+					+ "	lecture_period2 VARCHAR(45) NULL,\r\n"
+					+ "	lecture_credit INT NOT NULL,\r\n"
+					+ "	lecture_time INT NOT NULL,\r\n"
+					+ "	lecture_room VARCHAR(45) NOT NULL,\r\n"
+					+ " department_no INT NOT NULL,\r\n"
+					+ " professor_no INT NOT NULL,\r\n"
+					+ "	lecture_year INT NULL,\r\n"
+					+ "	lecture_semester INT NULL,\r\n"
+					+ "	FOREIGN KEY(professor_no) REFERENCES professor (professor_no) ON DELETE RESTRICT ON UPDATE CASCADE,\r\n"
+					+ " FOREIGN KEY(department_no) REFERENCES department (department_no) ON DELETE RESTRICT ON UPDATE CASCADE)");
+			stmt.execute("CREATE TABLE IF NOT EXISTS course (\r\n"
+					+ "	lecture_no INT NOT NULL,\r\n"
+					+ "	student_no INT NOT NULL,\r\n"
+					+ "	attendance_score INT NULL,\r\n"
+					+ "	midterm_score INT NULL,\r\n"
+					+ "	finals_score INT NULL,\r\n"
+					+ "	other_score INT NULL,\r\n"
+					+ " total_score INT NULL,\r\n"
+					+ "	grade VARCHAR(2) NULL,\r\n"
+					+ " PRIMARY KEY (lecture_no, student_no),\r\n"
+					+ "	FOREIGN KEY(lecture_no) REFERENCES lecture (lecture_no) ON DELETE CASCADE ON UPDATE CASCADE,\r\n"
+					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE CASCADE ON UPDATE CASCADE)");
 			
 			/* 교수 */
 			stmt.execute("INSERT INTO professor VALUES(1, '주경희', '집912', '02-3408-3106', 'chukh@sejong.ac.kr')");
@@ -343,31 +343,31 @@ public class InitDataBase {
 			stmt.execute("INSERT INTO tutoring VALUES(2110, 21, '1학년1학기')");
 			
 			/* 동아리 */
-			stmt.execute("INSERT INTO club VALUES(1, '동아리1', 2, '학601', '1', 2001)");
-			stmt.execute("INSERT INTO club VALUES(2, '동아리2', 2, '학602', '2', 2002)");
-			stmt.execute("INSERT INTO club VALUES(3, '동아리3', 2, '학603', '3', 2003)");
-			stmt.execute("INSERT INTO club VALUES(4, '동아리4', 2, '학604', '4', 2004)");
-			stmt.execute("INSERT INTO club VALUES(5, '동아리5', 2, '학605', '5', 2005)");
-			stmt.execute("INSERT INTO club VALUES(6, '동아리6', 2, '학501', '6', 2006)");
-			stmt.execute("INSERT INTO club VALUES(7, '동아리7', 2, '학502', '7', 2007)");
-			stmt.execute("INSERT INTO club VALUES(8, '동아리8', 2, '학503', '8', 2008)");
-			stmt.execute("INSERT INTO club VALUES(9, '동아리9', 2, '학504', '9', 2009)");
-			stmt.execute("INSERT INTO club VALUES(10, '동아리10', 2, '학505', '10', 2010)");
-			stmt.execute("INSERT INTO club VALUES(11, '동아리11', 2, '학401', '11', 2011)");
-			stmt.execute("INSERT INTO club VALUES(12, '동아리12', 2, '학402', '12', 2012)");
-			stmt.execute("INSERT INTO club VALUES(13, '동아리13', 2, '학403', '13', 2013)");
-			stmt.execute("INSERT INTO club VALUES(14, '동아리14', 2, '학404', '14', 2014)");
-			stmt.execute("INSERT INTO club VALUES(15, '동아리15', 2, '학405', '15', 2015)");
-			stmt.execute("INSERT INTO club VALUES(16, '동아리16', 2, '학301', '16', 2016)");
-			stmt.execute("INSERT INTO club VALUES(17, '동아리17', 2, '학302', '17', 2017)");
-			stmt.execute("INSERT INTO club VALUES(18, '동아리18', 2, '학303', '18', 2018)");
-			stmt.execute("INSERT INTO club VALUES(19, '동아리19', 2, '학304', '19', 2019)");
-			stmt.execute("INSERT INTO club VALUES(20, '동아리20', 2, '학305', '20', 2020)");
-			stmt.execute("INSERT INTO club VALUES(21, '동아리21', 1, '학201', '21', 2021)");
-			stmt.execute("INSERT INTO club VALUES(22, '동아리22', 1, '학202', '22', 2022)");
-			stmt.execute("INSERT INTO club VALUES(23, '동아리23', 1, '학203', '23', 2023)");
-			stmt.execute("INSERT INTO club VALUES(24, '동아리24', 1, '학204', '24', 2024)");
-			stmt.execute("INSERT INTO club VALUES(25, '동아리25', 1, '학205', '25', 2025)");
+			stmt.execute("INSERT INTO club VALUES(1, '동아리1', 2, '학601', 1, 2001)");
+			stmt.execute("INSERT INTO club VALUES(2, '동아리2', 2, '학602', 2, 2002)");
+			stmt.execute("INSERT INTO club VALUES(3, '동아리3', 2, '학603', 3, 2003)");
+			stmt.execute("INSERT INTO club VALUES(4, '동아리4', 2, '학604', 4, 2004)");
+			stmt.execute("INSERT INTO club VALUES(5, '동아리5', 2, '학605', 5, 2005)");
+			stmt.execute("INSERT INTO club VALUES(6, '동아리6', 2, '학501', 6, 2006)");
+			stmt.execute("INSERT INTO club VALUES(7, '동아리7', 2, '학502', 7, 2007)");
+			stmt.execute("INSERT INTO club VALUES(8, '동아리8', 2, '학503', 8, 2008)");
+			stmt.execute("INSERT INTO club VALUES(9, '동아리9', 2, '학504', 9, 2009)");
+			stmt.execute("INSERT INTO club VALUES(10, '동아리10', 2, '학505', 10, 2010)");
+			stmt.execute("INSERT INTO club VALUES(11, '동아리11', 2, '학401', 11, 2011)");
+			stmt.execute("INSERT INTO club VALUES(12, '동아리12', 2, '학402', 12, 2012)");
+			stmt.execute("INSERT INTO club VALUES(13, '동아리13', 2, '학403', 13, 2013)");
+			stmt.execute("INSERT INTO club VALUES(14, '동아리14', 2, '학404', 14, 2014)");
+			stmt.execute("INSERT INTO club VALUES(15, '동아리15', 2, '학405', 15, 2015)");
+			stmt.execute("INSERT INTO club VALUES(16, '동아리16', 2, '학301', 16, 2016)");
+			stmt.execute("INSERT INTO club VALUES(17, '동아리17', 2, '학302', 17, 2017)");
+			stmt.execute("INSERT INTO club VALUES(18, '동아리18', 2, '학303', 18, 2018)");
+			stmt.execute("INSERT INTO club VALUES(19, '동아리19', 2, '학304', 19, 2019)");
+			stmt.execute("INSERT INTO club VALUES(20, '동아리20', 2, '학305', 20, 2020)");
+			stmt.execute("INSERT INTO club VALUES(21, '동아리21', 1, '학201', 21, 2021)");
+			stmt.execute("INSERT INTO club VALUES(22, '동아리22', 1, '학202', 22, 2022)");
+			stmt.execute("INSERT INTO club VALUES(23, '동아리23', 1, '학203', 23, 2023)");
+			stmt.execute("INSERT INTO club VALUES(24, '동아리24', 1, '학204', 24, 2024)");
+			stmt.execute("INSERT INTO club VALUES(25, '동아리25', 1, '학205', 25, 2025)");
 			
 			/* 동아리원 */
 			stmt.execute("INSERT INTO club_join VALUES(2001, 1)");
@@ -612,7 +612,7 @@ public class InitDataBase {
 			stmt.execute("INSERT INTO course VALUES(50,2025,100,52,50,100,66,'C+')");
 			stmt.execute("INSERT INTO course VALUES(50,2023,100,78,70,90,79,'B+')");
 		} catch (SQLException e) {
-			System.out.println("쿼리 읽기 실패 InitDataBase :" + e);
+			System.out.println("데이터초기화 실패 :" + e);
 		}
 	}
 }
