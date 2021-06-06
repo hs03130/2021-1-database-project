@@ -68,7 +68,7 @@ public class InitDataBase {
 					+ "	student_no INT NOT NULL,\r\n"
 					+ "	club_no INT NOT NULL,\r\n"
 					+ "	PRIMARY KEY (student_no, club_no),\r\n"
-					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE CASCADE ON UPDATE CASCADE,\r\n"
+					+ "	FOREIGN KEY(student_no) REFERENCES student (student_no) ON DELETE RESTRICT ON UPDATE CASCADE,\r\n"
 					+ "	FOREIGN KEY(club_no) REFERENCES club (club_no) ON DELETE CASCADE ON UPDATE CASCADE)");
 			stmt.execute("CREATE TABLE IF NOT EXISTS lecture (\r\n"
 					+ "	lecture_no INT NOT NULL PRIMARY KEY,\r\n"
@@ -353,7 +353,7 @@ public class InitDataBase {
 			stmt.execute("INSERT INTO club VALUES(8, '동아리8', 2, '학503', 8, 2008)");
 			stmt.execute("INSERT INTO club VALUES(9, '동아리9', 2, '학504', 9, 2009)");
 			stmt.execute("INSERT INTO club VALUES(10, '동아리10', 2, '학505', 10, 2010)");
-			stmt.execute("INSERT INTO club VALUES(11, '동아리11', 2, '학401', 11, 2011)");
+			stmt.execute("INSERT INTO club VALUES(11, '동아리11', 3, '학401', 11, 2011)");
 			stmt.execute("INSERT INTO club VALUES(12, '동아리12', 2, '학402', 12, 2012)");
 			stmt.execute("INSERT INTO club VALUES(13, '동아리13', 2, '학403', 13, 2013)");
 			stmt.execute("INSERT INTO club VALUES(14, '동아리14', 2, '학404', 14, 2014)");
