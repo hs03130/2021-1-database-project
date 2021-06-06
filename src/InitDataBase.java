@@ -139,7 +139,7 @@ public class InitDataBase {
 			stmt.execute("INSERT INTO department VALUES(9, '경제학과', '02-3408-3306', '광704B', 9)");
 			stmt.execute("INSERT INTO department VALUES(10, '경영학과', '02-3408-3311', '광317', 10)");
 			stmt.execute("INSERT INTO department VALUES(11, '호텔관광경영학과', '02-3408-3312', '광517', 11)");
-			stmt.execute("INSERT INTO department  (12, '외식경영학과', '02-3408-3313', '광519', 12)");
+			stmt.execute("INSERT INTO department VALUES(12, '외식경영학과', '02-3408-3313', '광519', 12)");
 			stmt.execute("INSERT INTO department VALUES(13, '수학전공', '02-3408-3315', '영313', 13)");
 			stmt.execute("INSERT INTO department VALUES(14, '물리천문학과', '02-3408-3316', '영113', 14)");
 			stmt.execute("INSERT INTO department VALUES(15, '화학과', '02-3408-3317', '영215', 15)");
@@ -415,6 +415,7 @@ public class InitDataBase {
 			stmt.execute("INSERT INTO club_join VALUES(2108, 18)");
 			stmt.execute("INSERT INTO club_join VALUES(2109, 19)");
 			stmt.execute("INSERT INTO club_join VALUES(2110, 20)");
+			stmt.execute("INSERT INTO club_join VALUES(2001, 11)");
 			
 			/* 강의 */
 			stmt.execute("INSERT INTO lecture VALUES(1, 1, '한국문학의이해', '금', '15,16,17,18,19,20', '', '', 3, 3, '집301', 1, 1, 2020, 1)");
