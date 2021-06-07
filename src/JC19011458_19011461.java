@@ -2700,13 +2700,15 @@ public class JC19011458_19011461 extends JFrame {
         return true;
     }
 
-    public void updateSet(String query) {
+    public boolean updateSet(String query) {
         try {
             stmt = con.createStatement();
             stmt.execute(query);
         } catch (SQLException e) {
             System.out.println("수정 실패 :" + e);
+            return false;
         }
+        return true;
     }
 
     /* 최근 학년-학기, 등록금 완납 안된 학기는 무시 */
@@ -3606,7 +3608,7 @@ public class JC19011458_19011461 extends JFrame {
         pnDelete.setLayout(new BorderLayout());
 
         /* 입력 */
-        JLabel banInsert = new JLabel("학생 삽입은 최소 한 학기 등록과 함께 이루어져야합니다.");
+        JLabel banInsert = new JLabel("새로운 학생 삽입은 입학처리 기능을 이용해주세요");
         JButton enterShortCut = new JButton("바로가기");
         enterShortCut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -3616,84 +3618,6 @@ public class JC19011458_19011461 extends JFrame {
         });
         pnInsert.add(banInsert);
         pnInsert.add(enterShortCut);
-//		JPanel pnInsertGrid = new JPanel();
-//		pnInsertGrid.setLayout(new GridLayout(9, 2, 5, 5));
-//		JTextField insert_student_no = new JTextField();
-//		JTextField insert_student_name = new JTextField();
-//		JTextField insert_student_address = new JTextField();
-//		JTextField insert_student_phone = new JTextField();
-//		JTextField insert_student_email = new JTextField();
-//		JTextField insert_student_account = new JTextField();
-//		JTextField insert_major_no = new JTextField();
-//		JTextField insert_minor_no = new JTextField();
-//		JButton btnInsert = new JButton("입력");
-//		btnInsert.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				if (selectStudentNo().contains(" " + insert_student_no.getText() + " ") == true) {
-//					JOptionPane.showMessageDialog(null, "이미 존재하는 학번입니다.", "", JOptionPane.ERROR_MESSAGE);
-//					return;
-//				}
-//				if (selectDepartmentNo().contains(" " + insert_major_no.getText() + " ") == false) {
-//					JOptionPane.showMessageDialog(null, "전공 학과가 존재하지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
-//					return;
-//				}
-//				if (!insert_minor_no.getText().equals("")
-//						&& selectDepartmentNo().contains(" " + insert_minor_no.getText() + " ") == false) {
-//					JOptionPane.showMessageDialog(null, "부전공 학과가 존재하지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
-//					return;
-//				}
-//				if (isValidEmail(insert_student_email.getText()) == false) {
-//					JOptionPane.showMessageDialog(null, "이메일 형식이 올바르지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
-//					return;
-//				}
-//				if (insert_major_no.getText().equals(insert_minor_no.getText())) {
-//					JOptionPane.showMessageDialog(null, "전공과 다른 부전공을 입력해주세요.", "", JOptionPane.ERROR_MESSAGE);
-//					return;
-//				}
-//				int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
-//				if (result == JOptionPane.OK_OPTION) {
-//					try {
-//						stmt = con.createStatement();
-//						String query = String.format(
-//								"INSERT INTO student VALUES(%s, '%s', '%s', '%s', '%s', '%s', %s%s)",
-//								insert_student_no.getText(), insert_student_name.getText(),
-//								insert_student_address.getText(), insert_student_phone.getText(),
-//								insert_student_email.getText(), insert_student_account.getText(),
-//								insert_major_no.getText(),
-//								insert_minor_no.getText().equals("") ? insert_minor_no.getText()
-//										: ", " + insert_minor_no.getText());
-//						System.out.println(query);
-//						stmt.execute(query);
-//						JOptionPane.showMessageDialog(null, "실행이 정상적으로 종료하였습니다..", "", JOptionPane.PLAIN_MESSAGE);
-//						JPanel pnBtn = (JPanel) pnHeader.getComponent(1);
-//						((AbstractButton) pnBtn.getComponent(4)).doClick();
-//					} catch (SQLException ex) {
-//						System.out.println("학생 추가 실패 :" + ex);
-//					}
-//				}
-//			}
-//		});
-//
-//		pnInsertGrid.add(new JLabel("student_no"));
-//		pnInsertGrid.add(insert_student_no);
-//		pnInsertGrid.add(new JLabel("student_name"));
-//		pnInsertGrid.add(insert_student_name);
-//		pnInsertGrid.add(new JLabel("student_address"));
-//		pnInsertGrid.add(insert_student_address);
-//		pnInsertGrid.add(new JLabel("student_phone"));
-//		pnInsertGrid.add(insert_student_phone);
-//		pnInsertGrid.add(new JLabel("student_email"));
-//		pnInsertGrid.add(insert_student_email);
-//		pnInsertGrid.add(new JLabel("student_account"));
-//		pnInsertGrid.add(insert_student_account);
-//		pnInsertGrid.add(new JLabel("major_no"));
-//		pnInsertGrid.add(insert_major_no);
-//		pnInsertGrid.add(new JLabel("minor_no"));
-//		pnInsertGrid.add(insert_minor_no);
-//		pnInsertGrid.add(new JLabel(""));
-//		pnInsertGrid.add(btnInsert);
-//		pnInsert.add("North", new JLabel("INSERT INTO student VALUES"));
-//		pnInsert.add("Center", pnInsertGrid);
 
         /* 수정 */
         JPanel pnUpdateGrid = new JPanel();
@@ -3706,6 +3630,26 @@ public class JC19011458_19011461 extends JFrame {
         JCheckBox update_student_account_check = new JCheckBox("student_account");
         JCheckBox update_major_no_check = new JCheckBox("major_no");
         JCheckBox update_minor_no_check = new JCheckBox("minor_no");
+        /* 전공과 부전공은 동시에 바꿔야 한다. */
+//        update_major_no_check.addItemListener(new ItemListener() {
+//            public void itemStateChanged(ItemEvent e) {
+//                if (update_major_no_check.isSelected()) {
+//                    JOptionPane.showMessageDialog(null, "전공/부전공 비교를 위해 함께 변경되어야 합니다.", "", JOptionPane.PLAIN_MESSAGE);
+//                    update_minor_no_check.setSelected(true);
+//                } else { // !update_major_no_check.isSelected()
+//                    update_minor_no_check.setSelected(false);
+//                }
+//            }
+//        });
+//        update_minor_no_check.addItemListener(new ItemListener() {
+//            public void itemStateChanged(ItemEvent e) {
+//                if (update_minor_no_check.isSelected()) {
+//                    update_major_no_check.setSelected(true);
+//                } else { // !update_minor_no_check.isSelected()
+//                    update_major_no_check.setSelected(false);
+//                }
+//            }
+//        });
 
         JTextField update_student_no = new JTextField();
         JTextField update_student_name = new JTextField();
@@ -3719,39 +3663,143 @@ public class JC19011458_19011461 extends JFrame {
         JButton btnUpdate = new JButton("수정");
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 String query = "UPDATE student SET ";
+                if (update_where.getText().equals("")) {
+                    if (update_student_no_check.isSelected() || (!update_major_no_check.isSelected() && update_minor_no_check.isSelected()) || (update_major_no_check.isSelected() && !update_minor_no_check.isSelected())) {
+                        JOptionPane.showMessageDialog(null, "전체의 학생의 학번 혹은 전공/부전공 중 하나의 값만 동시에 변경할 수는 없습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
                 if (update_student_no_check.isSelected()) {
+                    if (update_student_no.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "학번을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (!update_student_no.getText().matches(regExp)) {
+                        JOptionPane.showMessageDialog(null, "학번은 숫자입니다.", "", JOptionPane.ERROR_MESSAGE);
+                        update_student_no.requestFocus();
+                        return; // 학번이 숫자가 아닐 때
+                    }
+                    if (selectStudentNo().contains(" " + update_student_no.getText() + " ") == true) {
+                        JOptionPane.showMessageDialog(null, "이미 존재하는 학번입니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_no_check.getText() + " = " + update_student_no.getText() + ", ";
                 }
                 if (update_student_name_check.isSelected()) {
+                    if (update_student_name.getText().trim().equals("")) {
+                        JOptionPane.showMessageDialog(null, "이름을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_name_check.getText() + " = '" + update_student_name.getText() + "', ";
                 }
                 if (update_student_address_check.isSelected()) {
+                    if (update_student_address.getText().trim().equals("")) {
+                        JOptionPane.showMessageDialog(null, "주소를 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_address_check.getText() + " = '" + update_student_address.getText() + "', ";
                 }
                 if (update_student_phone_check.isSelected()) {
+                    if (update_student_phone.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "핸드폰번호를 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (!update_student_phone.getText().matches("(01[016789])-(\\d{3,4})-(\\d{4})")){
+                        JOptionPane.showMessageDialog(null, "전화번호 형식이 올바르지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_phone_check.getText() + " = '" + update_student_phone.getText() + "', ";
                 }
                 if (update_student_email_check.isSelected()) {
+                    if (update_student_email.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "이메일을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (isValidEmail(update_student_email.getText()) == false) {
+                        JOptionPane.showMessageDialog(null, "이메일 형식이 올바르지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_email_check.getText() + " = '" + update_student_email.getText() + "', ";
                 }
                 if (update_student_account_check.isSelected()) {
+                    if (update_student_account.getText().trim().equals("")) {
+                        JOptionPane.showMessageDialog(null, "계좌를 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_student_account_check.getText() + " = '" + update_student_account.getText() + "', ";
                 }
                 if (update_major_no_check.isSelected()) {
+                    if (update_major_no.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "전공을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (selectDepartmentNo().contains(" " + update_major_no.getText() + " ") == false) {
+                        JOptionPane.showMessageDialog(null, "전공 학과가 존재하지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_major_no_check.getText() + " = " + update_major_no.getText() + ", ";
                 }
                 if (update_minor_no_check.isSelected()) {
+                    if (!update_minor_no.getText().equals("") && selectDepartmentNo().contains(" " + update_minor_no.getText() + " ") == false) {
+                        JOptionPane.showMessageDialog(null, "부전공 학과가 존재하지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_minor_no_check.getText() + " = " + update_minor_no.getText() + ", ";
+                }
+                // 부전공 또는 전공 하나만 변경할 경우 where로 선택되는 student는 한명이어야 전공-부전공 비교가 가능하다. 부전공-전공 모두 변경할 경우 상관x
+                if (update_major_no_check.isSelected() && update_minor_no_check.isSelected()) {
+                    if (update_major_no.getText().equals(update_minor_no.getText())) {
+                        JOptionPane.showMessageDialog(null, "전공과 다른 부전공을 입력해주세요.", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else if ((!update_major_no_check.isSelected() && update_minor_no_check.isSelected()) || (update_major_no_check.isSelected() && !update_minor_no_check.isSelected())) {
+                    try {   // 조건식에 해당하는 student가 한명인지 확인
+                        String query1 = "SELECT COUNT(student_no) FROM student WHERE " + update_where.getText();
+                        stmt = con.createStatement();
+                        rs = stmt.executeQuery(query1);
+                        rs.next();
+                        if (rs.getInt(1) != 0 && rs.getInt(1) != 1) { //0은 무시되서 가능
+                            JOptionPane.showMessageDialog(null, "부전공 또는 전공 하나만 변경할 경우 조건식에 해당하는 student는 한 명이어야합니다.", "", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+
+                    try {    // 현재 전공, 부전공 알아오기
+                        String query1 = "SELECT major_no, minor_no FROM student WHERE " + update_where.getText();
+                        stmt = con.createStatement();
+                        rs = stmt.executeQuery(query1);
+                        rs.next();
+                        if (update_major_no_check.isSelected()) {   // 전공이 바뀌면 부전공과 비교
+                            if (!(rs.getString(2) == null || rs.getString(2).length() == 0) && rs.getString(2).equals(update_major_no.getText())) {
+                                JOptionPane.showMessageDialog(null, "기존 부전공과 같은 전공입니다.", "", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        } else if (update_minor_no_check.isSelected()) {    // 부전공이 바뀐다면 전공과 비교
+                            if (rs.getString(1).equals(update_minor_no.getText())) {
+                                JOptionPane.showMessageDialog(null, "기존 전공과 같은 부전공입니다.", "", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                 }
                 query = query.substring(0, query.length() - 2);
                 if (!update_where.getText().equals("")) {
                     query += " WHERE " + update_where.getText();
                 }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(4)).doClick();
-
+                int result = JOptionPane.showConfirmDialog(null, "수정 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    if (updateSet(query) == true) {
+                        JOptionPane.showMessageDialog(null, "수정 완료", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(4)).doClick();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "수정 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
 
