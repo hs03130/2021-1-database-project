@@ -769,7 +769,7 @@ public class JC19011458_19011461 extends JFrame {
                     JOptionPane.showMessageDialog(null, "이메일 형식이 올바르지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
+                //TODO 참고
                 if (!tuition_tuition_year.getText().matches(regExp)){
                     JOptionPane.showMessageDialog(null, "등록연도를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
                     return; // 년도가 숫자가 아닐 때
@@ -2572,7 +2572,6 @@ public class JC19011458_19011461 extends JFrame {
         return Double.toString(midterm * 0.3 + finals * 0.4 + other * 0.2 + attendance * 0.1);
     }
 
-    /* 유효성 검사 */
     // 이메일 형식 확인
     public static boolean isValidEmail(String email) {
         return Pattern.matches("^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", email);
@@ -2589,7 +2588,7 @@ public class JC19011458_19011461 extends JFrame {
         }
     }
 
-    // 등록할 년도-학기와 등록금 납부월이 일치하지 않을 때 (늦게낸거는 등록하거나 수정할 필요 x)
+    // 납부기간 확인 (false 지남, true 납부 기간)
     public boolean isDeadline(String checkDate, String year, String semester) {
         SimpleDateFormat deadlineDateFormat = new SimpleDateFormat("yyyy-MM", Locale.KOREA);
         deadlineDateFormat.setLenient(false);
@@ -2713,10 +2712,7 @@ public class JC19011458_19011461 extends JFrame {
 
     /* 최근 학년-학기, 등록금 완납 안된 학기는 무시 */
     public boolean selectLastGradeSemester(String student_no, String grade_semester) { // 학년-학기 형식에 맞는 것만 입력됨
-        String str = "";
-        String grade = "";
-        String semester = "";
-        String[] newGradeSemester = grade_semester.split("학년");
+        String str = "", grade = "", semester = "";
 
         try {
             stmt = con.createStatement();
@@ -2742,6 +2738,38 @@ public class JC19011458_19011461 extends JFrame {
         } else {
             return false;
         }
+    }
+
+    public boolean gradeSemesterYearSemester(String student_no, String grade_semester, String tuition_year, String tuition_semester) {  //grade_semester 형식 맞는것만
+        String grade = "", semester = "", query = "", preGrade = "", preSemester = "", str ="";
+
+        grade = grade_semester.split("학년")[0];
+        semester = (grade_semester.split("학년")[1]).split("학기")[0];
+
+        if (tuition_semester.equals("1")) { // grade_semester : 1학기
+            query = String.format("SELECT grade_semester FROM tuition WHERE student_no = %s AND tuition_year < %s AND tuition_fee = tuition_payment ORDER BY grade_semester DESC LIMIT 1", student_no, tuition_year);
+        } else if (tuition_semester.equals("2")) { // grade_semester : 2학기
+            query = String.format("SELECT grade_semester FROM tuition WHERE student_no = %s AND (tuition_year < %s OR (tuition_year = %s AND grade_semester LIKE '%%학년1학기')) AND tuition_fee = tuition_payment ORDER BY grade_semester DESC LIMIT 1",student_no, tuition_year, tuition_year);
+        }
+
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(query);
+            rs.next();
+            str += rs.getString(1);
+            preGrade = str.split("학년")[0];
+            preSemester = (str.split("학년")[1]).split("학기")[0];
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        /* 다음 학기 맞는지 확인 */
+        if (preSemester.equals("1")) {
+            return grade.equals(preGrade) && semester.equals("2");
+        } else if (preSemester.equals("2")) {
+            return Integer.parseInt(preGrade) + 1 == Integer.parseInt(grade) && semester.equals("1");
+        }
+        return false;
     }
 
     /* 현재 학년-학기보다 낮은 학기인가 */
@@ -3211,7 +3239,7 @@ public class JC19011458_19011461 extends JFrame {
 
     }
 
-    // TODO 미완료 : professor, department, affiliatedProfessor, student, tuition
+    // TODO 미완료 : professor, department, affiliatedProfessor, tuition
     public JPanel adminAdministrationProfessor(JPanel pnHeader) {
         c.remove(pnCenter);
         pnCenter.removeAll();
@@ -3878,21 +3906,55 @@ public class JC19011458_19011461 extends JFrame {
         JTextField insert_tuition_semester = new JTextField();
         JTextField insert_tuition_fee = new JTextField();
         JTextField insert_tuition_payment = new JTextField();
+        insert_tuition_payment.setText("0");
         JTextField insert_last_payment_date = new JTextField();
         JTextField insert_grade_semester = new JTextField();
         JButton btnInsert = new JButton("입력");
         btnInsert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                if (insert_student_no.getText().equals("") || insert_tuition_year.getText().equals("") || insert_tuition_semester.getText().equals("")|| insert_tuition_fee.getText().equals("")) {
+                    JOptionPane.showMessageDialog(null, "학번, 연도, 학기, 고지금액을 모두 입력해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 학번, 연도, 학기, 고지금액 빈칸
+                }
+                if (!insert_student_no.getText().matches(regExp)){
+                    JOptionPane.showMessageDialog(null, "학번을 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 학번이 숫자가 아닐 때
+                }
+                if (!insert_tuition_year.getText().matches(regExp)){
+                    JOptionPane.showMessageDialog(null, "등록연도를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 년도가 숫자가 아닐 때
+                }
+                if (!insert_tuition_semester.getText().equals("1") && !insert_tuition_semester.getText().equals("2") ) {
+                    JOptionPane.showMessageDialog(null, "등록학기를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 학기가 올바르지 않을 때
+                }
                 if (!insert_tuition_fee.getText().matches(regExp)) {
                     JOptionPane.showMessageDialog(null, "고지금액을 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
-                    insert_tuition_fee.requestFocus();
                     return; // 고지금액이 숫자가 아닐 때
                 }
                 if (!insert_tuition_payment.getText().matches(regExp)) {
                     JOptionPane.showMessageDialog(null, "납부금액을 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
-                    insert_tuition_fee.requestFocus();
                     return; // 납부금액이 숫자가 아닐 때
+                }
+                if (Integer.parseInt(insert_tuition_fee.getText()) < Integer.parseInt(insert_tuition_payment.getText())) {
+                    JOptionPane.showMessageDialog(null, "납부금액을 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 고지금액보다 납부금액이 많을때
+                }
+                if (insert_tuition_payment.getText().equals("0") != insert_last_payment_date.getText().equals("")) {
+                    JOptionPane.showMessageDialog(null, "납부금액 혹은 납부일자를 확인 해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 납부한 금액은 없는데 납부 날짜가 있을 때, 등록금을 납부했는데 납부한 날짜가 없을 때
+                }
+                if (!insert_last_payment_date.getText().equals("") && isValidDate(insert_last_payment_date.getText()) == false) {
+                    JOptionPane.showMessageDialog(null, "납부일자를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // (납부를 해서)null이 아닌데 날짜 형식이 유효하지 않을 때
+                }
+                if (!insert_last_payment_date.getText().equals("") && isDeadline(insert_last_payment_date.getText(), insert_tuition_year.getText(), insert_tuition_semester.getText()) == false) {
+                    JOptionPane.showMessageDialog(null, "납부기간이 아닙니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 납부 기간이 아닐 때 (2021년 1학기 등록인데 등록금 납부 일자가 2021년 02월이 아닐 때, 납부를 하지 않으면 수강신청을 할 수 없기 때문에 등록은 의미 없음)
+                }
+                if (isValidGradeSemester(insert_grade_semester.getText()) == false) {
+                    JOptionPane.showMessageDialog(null, "학년/학기 형식을 확인해주세요.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 학년-학기 형식이 유효하지 않을 때
                 }
                 if (selectStudentNo().contains(" " + insert_student_no.getText() + " ") == false) {
                     JOptionPane.showMessageDialog(null, "존재하지 않는 학번입니다.", "", JOptionPane.ERROR_MESSAGE);
@@ -3903,22 +3965,10 @@ public class JC19011458_19011461 extends JFrame {
                     JOptionPane.showMessageDialog(null, "이미 등록된 학생입니다.", "", JOptionPane.ERROR_MESSAGE);
                     return; // 이미 등록된 학생일 때
                 }
-                if (insert_tuition_payment.getText().equals("0") != insert_last_payment_date.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "납부금액 혹은 납부일자를 확인 해주세요", "", JOptionPane.ERROR_MESSAGE);
-                    return; // 납부한 금액은 없는데 납부 날짜가 있을 때, 등록금을 납부했는데 납부한 날짜가 없을 때
-                }
-                if (!insert_last_payment_date.getText().equals("")
-                        && isValidDate(insert_last_payment_date.getText()) == false) {
-                    JOptionPane.showMessageDialog(null, "납부일자를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
-                    return; // null이 아닌 날짜 형식이 유효하지 않을 때
-                }
-                if (isValidGradeSemester(insert_tuition_semester.getText()) == false
-                        || selectLastGradeSemester(insert_student_no.getText(),
-                        insert_tuition_semester.getText()) == false) {
+                if (gradeSemesterYearSemester(insert_student_no.getText(), insert_grade_semester.getText(), insert_tuition_year.getText(), insert_tuition_semester.getText()) == false) {
                     JOptionPane.showMessageDialog(null, "학년/학기를 확인해주세요.", "", JOptionPane.ERROR_MESSAGE);
-                    return; // 학년/학기 형식이 유효하지 않을 때, 마지막 등록한 학년/학기의 다음 학년/학기가 아닐 때
+                    return; // 마지막 정상 등록한 학기의 다음학기가 맞는지 (연도-학기 고려)
                 }
-                //TODO 등록이 안된 2020학년-2학기인데 2021년-1학기는 등록이 되어잇음
 
                 try { // 날짜 형식 맞춰서 입력
                     insert_last_payment_date
@@ -3930,7 +3980,6 @@ public class JC19011458_19011461 extends JFrame {
 
                 int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
-
                     try {
                         stmt = con.createStatement();
                         String query = String.format("INSERT INTO tuition VALUES(%s, %s, %s, %s, %s, '%s', '%s')",
@@ -3941,10 +3990,9 @@ public class JC19011458_19011461 extends JFrame {
                         System.out.println(query);
                         stmt.execute(query);
                         JOptionPane.showMessageDialog(null, "실행이 정상적으로 종료하였습니다.", "", JOptionPane.PLAIN_MESSAGE);
-                        JPanel pnBtn = (JPanel) pnHeader.getComponent(1);
                         ((AbstractButton) pnBtn.getComponent(5)).doClick();
                     } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "실패 : " + e, "", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "삽입 실패 : " + e, "", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 
@@ -3972,50 +4020,55 @@ public class JC19011458_19011461 extends JFrame {
 
         /* 수정 */
         JPanel pnUpdateGrid = new JPanel();
-        pnUpdateGrid.setLayout(new GridLayout(9, 2, 5, 5));
+        pnUpdateGrid.setLayout(new GridLayout(8, 2, 5, 5));
 
-        JCheckBox update_student_no_check = new JCheckBox("student_no");
-        JCheckBox update_tuition_year_check = new JCheckBox("tuition_year");
-        JCheckBox update_tuition_semester_check = new JCheckBox("tuition_semester");
+//        JLabel update_student_no_check = new JLabel("student_no");
+        JLabel update_tuition_year_check = new JLabel("tuition_year");
+        JLabel update_tuition_semester_check = new JLabel("tuition_semester");
         JCheckBox update_tuition_fee_check = new JCheckBox("tuition_fee");
         JCheckBox update_tuition_payment_check = new JCheckBox("tuition_payment");
         JCheckBox update_last_payment_date_check = new JCheckBox("last_payment_date");
-        JCheckBox update_grade_semester_check = new JCheckBox("grade_semester");
+        JLabel update_grade_semester_check = new JLabel("grade_semester");
 
-        JTextField update_student_no = new JTextField();
+//        JTextField update_student_no = new JTextField();
         JTextField update_tuition_year = new JTextField();
+        update_tuition_year.setEditable(false);
+        update_tuition_year.setText("최근 학기만 수정할 수 있습니다.");
         JTextField update_tuition_semester = new JTextField();
+        update_tuition_semester.setEditable(false);
+        update_tuition_semester.setText("최근 학기만 수정할 수 있습니다.");
         JTextField update_tuition_fee = new JTextField();
         JTextField update_tuition_payment = new JTextField();
         JTextField update_last_payment_date = new JTextField();
         JTextField update_grade_semester = new JTextField();
+        update_grade_semester.setEditable(false);
+        update_grade_semester.setText("최근 학년 자동 계산");
         JTextField update_where = new JTextField();
         JButton btnUpdate = new JButton("수정");
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 String query = "UPDATE tuition SET ";
-                if (update_student_no_check.isSelected()) {
-                    query += update_student_no_check.getText() + " = " + update_student_no.getText() + ", ";
-                }
-                if (update_tuition_year_check.isSelected()) {
-                    query += update_tuition_year_check.getText() + " = " + update_tuition_year.getText() + ", ";
-                }
-                if (update_tuition_semester_check.isSelected()) {
-                    query += update_tuition_semester_check.getText() + " = " + update_tuition_semester.getText() + ", ";
-                }
                 if (update_tuition_fee_check.isSelected()) {
+                    if (update_tuition_fee_check.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "고지금액을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_tuition_fee_check.getText() + " = " + update_tuition_fee.getText() + ", ";
                 }
                 if (update_tuition_payment_check.isSelected()) {
+                    if (update_tuition_payment_check.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "납부금액을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_tuition_payment_check.getText() + " = " + update_tuition_payment.getText() + ", ";
                 }
                 if (update_last_payment_date_check.isSelected()) {
-                    query += update_last_payment_date_check.getText() + " = '" + update_last_payment_date.getText()
-                            + "', ";
-                }
-                if (update_grade_semester_check.isSelected()) {
-                    query += update_grade_semester_check.getText() + " = '" + update_grade_semester.getText() + "', ";
+                    if (update_last_payment_date_check.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "납부날짜를 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    query += update_last_payment_date_check.getText() + " = '" + update_last_payment_date.getText() + "', ";
                 }
                 query = query.substring(0, query.length() - 2);
                 if (!update_where.getText().equals("")) {
@@ -4027,8 +4080,8 @@ public class JC19011458_19011461 extends JFrame {
             }
         });
 
-        pnUpdateGrid.add(update_student_no_check);
-        pnUpdateGrid.add(update_student_no);
+//        pnUpdateGrid.add(update_student_no_check);
+//        pnUpdateGrid.add(update_student_no);
         pnUpdateGrid.add(update_tuition_year_check);
         pnUpdateGrid.add(update_tuition_year);
         pnUpdateGrid.add(update_tuition_semester_check);
@@ -4047,25 +4100,41 @@ public class JC19011458_19011461 extends JFrame {
         pnUpdateGrid.add(btnUpdate);
         pnUpdate.add("North", new JLabel("UPDATE tuition SET"));
         pnUpdate.add("Center", pnUpdateGrid);
+        pnUpdate.add("South", new JLabel("조건식에는 student_no에 대한 정보가 포함되어야 합니다.(빈칸 가능)"));
 
         /* 삭제 */
+        JPanel pnDeleteNorth = new JPanel();
+        pnDeleteNorth.setLayout(new BorderLayout());
+
         JTextField delete_where = new JTextField();
         JButton btnDelete = new JButton("삭제");
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM tuition WHERE " + delete_where.getText()) == true) {
-                        JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
-                        ((AbstractButton) pnBtn.getComponent(5)).doClick();
+                    if (!delete_where.getText().equals("")) {
+                        if (deleteFrom("DELETE FROM tuition WHERE tuition_fee > tuition_payment AND " + delete_where.getText()) == true) {
+                            JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
+                            ((AbstractButton) pnBtn.getComponent(5)).doClick();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                        if (deleteFrom("DELETE FROM tuition WHERE tuition_fee > tuition_payment " + delete_where.getText()) == true) {
+                            JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
+                            ((AbstractButton) pnBtn.getComponent(5)).doClick();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             }
         });
 
-        pnDelete.add("North", new JLabel("DELETE FROM tuition WHERE"));
+        pnDeleteNorth.add("North", new JLabel("정상등록된 학기는 삭제할 수 없습니다."));
+        pnDeleteNorth.add("Center", new JLabel("DELETE FROM tuition WHERE tuition_fee > tuition_payment (AND) "));
+
+        pnDelete.add("North", pnDeleteNorth);
         pnDelete.add("Center", delete_where);
         pnDelete.add("South", btnDelete);
 
