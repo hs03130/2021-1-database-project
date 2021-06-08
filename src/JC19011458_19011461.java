@@ -420,17 +420,14 @@ public class JC19011458_19011461 extends JFrame {
                 c.add("Center", adminAdministrationTutoring(pnHeader));
                 c.revalidate();
                 c.repaint();
+
             }
         });
         btnCourse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                pnCenter.removeAll();
-                pnCenter.add("North", pnHeader);
-                pnCenter.add("Center", showTableCourse());
-                c.remove(pnCenter);
-                c.add("Center", pnCenter);
+                c.add("Center", adminAdministrationCourse(pnHeader));
                 c.revalidate();
-                // c.repaint();
+                c.repaint();
             }
         });
         btnClub.addActionListener(new ActionListener() {
@@ -1210,8 +1207,7 @@ public class JC19011458_19011461 extends JFrame {
         c.repaint();
     }
 
-    public void modifyGrade(String lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model,
-                            int row) {
+    public void modifyGrade(String lectureNo, String lectureYear, String lectureSemester, DefaultTableModel model, int row) {
         String studentNo = (String) model.getValueAt(row, 0);
         String studentName = (String) model.getValueAt(row, 1);
         String midtermScore = (String) model.getValueAt(row, 2);
@@ -1294,11 +1290,11 @@ public class JC19011458_19011461 extends JFrame {
                 btnInput.setEnabled(true);
                 btnCancel.setEnabled(true);
                 try {
-                    if (Double.parseDouble(tfMidtermScore.getText()) > 100.0
-                            || Double.parseDouble(tfMidtermScore.getText()) < 0) {
+                    if (Double.parseDouble(tfMidtermScore.getText()) > 100.0 || Double.parseDouble(tfMidtermScore.getText()) < 0) {
                         JOptionPane.showMessageDialog(null, "0~100점으로 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
                         tfMidtermScore.setText("");
-                        tfTotalScore.setText(calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(),
+                        tfTotalScore.setText(
+                                calculateTotalScore(tfMidtermScore.getText(), tfFinalsScore.getText(),
                                 tfOtherScore.getText(), tfAttandence.getText()));
                         tfMidtermScore.requestFocus();
                         return;
@@ -2546,7 +2542,7 @@ public class JC19011458_19011461 extends JFrame {
         }
     }
 
-    public String calculateTotalScore(String midtermStr, String FinalsStr, String OtherStr, String AttandenceStr) {
+    public String calculateTotalScore(String midtermStr, String FinalsStr, String OtherStr, String AttendanceStr) {
         double midterm, finals, other, attendance;
         if (midtermStr.equals("")) {
             midterm = 0;
@@ -2563,13 +2559,14 @@ public class JC19011458_19011461 extends JFrame {
         } else {
             other = Double.parseDouble(OtherStr);
         }
-        if (AttandenceStr.equals("")) {
+        if (AttendanceStr.equals("")) {
             attendance = 0;
         } else {
-            attendance = Double.parseDouble(AttandenceStr);
+            attendance = Double.parseDouble(AttendanceStr);
         }
-
-        return Double.toString(midterm * 0.3 + finals * 0.4 + other * 0.2 + attendance * 0.1);
+        int tmp = (int)(midterm * 0.3 + finals * 0.4 + other * 0.2 + attendance * 0.1);
+//        int tmp = Integer.parseInt(Double.toString(midterm * 0.3 + finals * 0.4 + other * 0.2 + attendance * 0.1));
+        return Integer.toString(tmp);
     }
 
     // 이메일 형식 확인
@@ -2677,6 +2674,22 @@ public class JC19011458_19011461 extends JFrame {
         try {
             stmt = con.createStatement();
             String query = "SELECT club_no FROM club";
+            rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                str += rs.getString(1);
+                str += " ";
+            }
+        } catch (SQLException e) {
+            System.out.println("쿼리 읽기 실패 :" + e);
+        }
+        return str;
+    }
+
+    public String selectLectureNo() {
+        String str = " ";
+        try {
+            stmt = con.createStatement();
+            String query = "SELECT lecture_no FROM lecture";
             rs = stmt.executeQuery(query);
             while (rs.next()) {
                 str += rs.getString(1);
@@ -2809,7 +2822,7 @@ public class JC19011458_19011461 extends JFrame {
         try {
             stmt = con.createStatement();
             String query = String.format(
-                    "SELECT COUNT(*) FROM tuition WHERE student_no = %s AND tuition_year = %s AND tuition_semester = %s",
+                    "SELECT COUNT(*) FROM tuition WHERE student_no = %s AND tuition_year = %s AND tuition_semester = %s AND tuition_payment = tuition_fee",
                     studentNo, tuitionYear, tuitionSemester);
             rs = stmt.executeQuery(query);
             rs.next();
@@ -2841,6 +2854,24 @@ public class JC19011458_19011461 extends JFrame {
             System.out.println("쿼리 읽기 실패 :" + e);
         }
         return true;
+    }
+
+    /* 수강 여부 */
+    public boolean isInClass(String lecture_no, String student_no) {
+        try {
+            stmt = con.createStatement();
+            String query = String.format("SELECT COUNT(*) FROM course WHERE lecture_no = %s AND student_no = %s", lecture_no, student_no);
+            rs = stmt.executeQuery(query);
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                return false; // 등록 안되어있음
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("쿼리 읽기 실패 :" + e);
+        }
+        return false;
     }
 
     // DB 테이블 반환
@@ -3239,7 +3270,8 @@ public class JC19011458_19011461 extends JFrame {
 
     }
 
-    // TODO 미완료 : professor, department, affiliatedProfessor, tuition
+    // TODO 미완료 : professor, department, affiliatedProfessor
+
     public JPanel adminAdministrationProfessor(JPanel pnHeader) {
         c.remove(pnCenter);
         pnCenter.removeAll();
@@ -3257,109 +3289,311 @@ public class JC19011458_19011461 extends JFrame {
         pnDelete.setLayout(new BorderLayout());
 
         /* 입력 */
-        /* 삽입 */
-
         JPanel pnInsertGrid = new JPanel();
         pnInsertGrid.setLayout(new GridLayout(6, 2, 5, 5));
-        JTextField insert_professor_no = new JTextField();
-        JTextField insert_professor_name = new JTextField();
-        JTextField insert_professor_address = new JTextField();
-        JTextField insert_professor_phone = new JTextField();
-        JTextField insert_professor_email = new JTextField();
+        JTextField insertProfessorNo = new JTextField();
+        JTextField insertName = new JTextField();
+        JTextField insertAddress = new JTextField();
+        JTextField insertPhone = new JTextField();
+        JTextField insertEmail = new JTextField();
         JButton btnInsert = new JButton("입력");
+        btnInsert.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String professorNo = insertProfessorNo.getText();
+                String name = insertName.getText();
+                String address = insertAddress.getText();
+                String phone = insertPhone.getText();
+                String email = insertEmail.getText();
+
+                //예외처리1 : 데이터 없을 때
+                if(professorNo.isEmpty() || name.isEmpty() || address.isBlank() || phone.isBlank() || email.isBlank()) {
+                    showMessageDialog(null, "모든 데이터를 입력하셔야합니다.");
+                    return;
+                }
+
+                String query;
+                int n_prof=0, n_stud=0; //지도학생번호
+                try {
+
+                    stmt = con.createStatement();
+
+                    //예외2 : 1학생 1지도교수 <- 지도교수가 없거나 여러명일 수 없음.
+                    query = "select count(*) from professor";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        n_prof = rs.getInt(1);
+                    }
+                    query = "select count(*) from student";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        n_stud = rs.getInt(1);
+                    }
+                    if(n_prof >= n_stud) {
+                        showMessageDialog(null, "학생보다 교수가 많을 수 없습니다.");
+                        return;
+                    }
+
+
+//               //예외3: 학과 이름이 잘못된 경우
+//               query = "select department_no, department_name from department";
+//               rs = stmt.executeQuery(query);
+//               int department_no = 0;
+//               while(rs.next()) {
+//                  if(rs.getString(2).equals(department)) {
+//                     department_no = rs.getInt(1);
+//                  }
+//               }
+//               if(department_no == 0){
+//                  showMessageDialog(null, "'" +  department + "'라는\n 학과는 존재하지 않습니다.");
+//                  return;
+//               }
+//
+                    //예외3 : 교수번호가 이상한 경우
+                    if(!professorNo.matches(regExp)) {
+                        showMessageDialog(null, "학과번호는 숫자만 입력가능합니다.");
+                        return;
+                    }
+                    query = "select EXISTS (select * \r\n"
+                            + "            from professor\r\n"
+                            + "            where professor_no = " + professorNo + ")";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(rs.getBoolean(1)) {
+                            showMessageDialog(null, "다른 사람이 사용중인 교수 번호입니다.");
+                            return;
+                        }
+                    }
+
+                    //예외4 : 이미 등록된 교수인 경우
+//               query = "select professor_name, professor_phone from professor";
+                    query = "select professor_name, professor_phone from professor";
+                    rs = stmt.executeQuery(query);
+                    while(rs.next()) {
+                        if(name.equals(rs.getString(1)) && phone.equals(rs.getString(2))) {
+                            showMessageDialog(null, "이미 등록된 교수입니다.");
+                            return;
+                        }
+                    }
+
+                    //insert 실행
+                    int professor_no = 0;
+                    query = "select MAX(professor_no) from professor";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        professor_no = rs.getInt(1) + 1;
+                    }
+
+                    query = "INSERT INTO professor VALUES(" + professor_no + ",'" + name + "','" + address + "','" + phone + "','" + email + "')";
+                    stmt.execute(query);
+
+                    //소속 테이블 업데이트
+                    //걍 학과 만들기
+//               int department_no = 1;
+//               query = "select count(*) from department";
+//               rs = stmt.executeQuery(query);
+//               if(rs.next()) {
+//                  if(rs.getInt(1) == 0) {
+//                     department_no = 1;
+//                     query = "insert into department values (1, '임시학과', '02-1234-1234', '센801'," + professor_no + ")";
+//                     stmt.execute(query);
+//                     query = "insert into affiliated_professor values (" + professor_no + ", 1)";
+//                     stmt.execute(query);
+//                     showMessageDialog(null, "해당 교수가 '임시학과'의 학과장이 되었습니다.");
+//                     return;
+//                  }
+//               }
+
+                    int department_no = 1;
+                    query = "select min(department.department_no) from department";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        department_no = rs.getInt(1);
+                    }
+                    query = "INSERT INTO affiliated_professor values(" + professor_no + "," + department_no + ")";
+                    stmt.execute(query);
+
+                    //신입생 세미나 자동배정
+                    int lecture_no = 0;
+                    query = "select max(lecture_no) from lecture";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        lecture_no = rs.getInt(1) + 1;
+                    }
+                    int class_no = 1;
+                    query = "select max(lecture_class_no) \r\n"
+                            + "from lecture \r\n"
+                            + "where lecture_name = '신입생세미나' "
+                            + " and department_no = " + department_no
+                            + " and lecture_year = " + todayYear + " and lecture_semester = " + todaySemester;
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        class_no = rs.getInt(1) + 1;
+                    }
+                    query = "insert into lecture values(" + lecture_no + "," + class_no
+                            + ", '신입생세미나'," + "'금','21,22', '', '', 1, 1, '',"
+                            + department_no + "," + professor_no + "," + todayYear + "," + todaySemester + ")";
+                    stmt.execute(query);
+
+                    //지도학생 자동 배정
+                    query = "SELECT *\r\n"
+                            + "FROM tutoring\r\n"
+                            + "WHERE professor_no IN (SELECT professor_no\r\n"
+                            + "                  FROM tutoring\r\n"
+                            + "                  GROUP BY professor_no\r\n"
+                            + "                  HAVING COUNT(*) > 1)";
+                    rs = stmt.executeQuery(query);
+                    int mentor = 0, mentee = 0;
+                    if(rs.next()) {
+                        mentee = rs.getInt(1);
+                        mentor = rs.getInt(2);
+                    }
+                    query = "update tutoring\r\n"
+                            + "set professor_no = " + professor_no
+                            + " where student_no = " + mentee + " and professor_no = " + mentor;
+                    stmt.execute(query);
+                    showMessageDialog(null, "해당 교수는 신입생세미나(금18:00-19:00)을 배정받았습니다.\n학생 " + mentee + "의 지도를 배정받았습니다.");
+                    ((AbstractButton) pnBtn.getComponent(0)).doClick();
+
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+
+
+            }
+        });
 
         pnInsertGrid.add(new JLabel("professor_no"));
-        pnInsertGrid.add(insert_professor_no);
+        pnInsertGrid.add(insertProfessorNo);
         pnInsertGrid.add(new JLabel("professor_name"));
-        pnInsertGrid.add(insert_professor_name);
+        pnInsertGrid.add(insertName);
         pnInsertGrid.add(new JLabel("professor_address"));
-        pnInsertGrid.add(insert_professor_address);
+        pnInsertGrid.add(insertAddress);
         pnInsertGrid.add(new JLabel("professor_phone"));
-        pnInsertGrid.add(insert_professor_phone);
+        pnInsertGrid.add(insertPhone);
         pnInsertGrid.add(new JLabel("professor_email"));
-        pnInsertGrid.add(insert_professor_email);
+        pnInsertGrid.add(insertEmail);
         pnInsertGrid.add(new JLabel(""));
         pnInsertGrid.add(btnInsert);
         pnInsert.add("North", new JLabel("INSERT INTO professor VALUES"));
         pnInsert.add("Center", pnInsertGrid);
 
         /* 수정 */
-        JPanel pnUpdateGrid = new JPanel();
-        pnUpdateGrid.setLayout(new GridLayout(7, 2, 5, 5));
-        JCheckBox update_professor_no_check = new JCheckBox("professor_no");
-        JCheckBox update_professor_name_check = new JCheckBox("professor_name");
-        JCheckBox update_professor_address_check = new JCheckBox("professor_address");
-        JCheckBox update_professor_phone_check = new JCheckBox("professor_phone");
-        JCheckBox update_professor_email_check = new JCheckBox("professor_email");
 
-        JTextField update_professor_no = new JTextField();
-        JTextField update_professor_name = new JTextField();
-        JTextField update_professor_address = new JTextField();
-        JTextField update_professor_phone = new JTextField();
-        JTextField update_professor_email = new JTextField();
-        JTextField update_where = new JTextField();
+//      JPanel pnUpdateGrid = new JPanel();
+//      pnUpdateGrid.setLayout(new GridLayout(7, 2, 5, 5));
+//      JCheckBox update_professor_no_check = new JCheckBox("professor_no");
+//      JCheckBox update_professor_name_check = new JCheckBox("professor_name");
+//      JCheckBox update_professor_address_check = new JCheckBox("professor_address");
+//      JCheckBox update_professor_phone_check = new JCheckBox("professor_phone");
+//      JCheckBox update_professor_email_check = new JCheckBox("professor_email");
+//
+//      JTextField update_professor_no = new JTextField();
+//      JTextField update_professor_name = new JTextField();
+//      JTextField update_professor_address = new JTextField();
+//      JTextField update_professor_phone = new JTextField();
+//      JTextField update_professor_email = new JTextField();
+//      JTextField update_where = new JTextField();
+//      JButton btnUpdate = new JButton("수정");
+//      btnUpdate.addActionListener(new ActionListener() {
+//         public void actionPerformed(ActionEvent e) {
+//
+//            String query = "UPDATE professor SET ";
+//            if (update_professor_no_check.isSelected()) {
+//               query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
+//            }
+//            if (update_professor_name_check.isSelected()) {
+//               query += update_professor_name_check.getText() + " = '" + update_professor_name.getText() + "', ";
+//            }
+//            if (update_professor_address_check.isSelected()) {
+//               query += update_professor_address_check.getText() + " = '" + update_professor_address.getText() + "', ";
+//            }
+//            if (update_professor_phone_check.isSelected()) {
+//               query += update_professor_phone_check.getText() + " = '" + update_professor_phone.getText() + "' , ";
+//            }
+//            if (update_professor_email_check.isSelected()) {
+//               query += update_professor_email_check.getText() + " = '" + update_professor_email.getText() + "', ";
+//            }
+//            query = query.substring(0, query.length() - 2);
+//            if (!update_where.getText().equals("")) {
+//               query += " WHERE " + update_where.getText();
+//            }
+//            //updateSet(query);
+//            ((AbstractButton) pnBtn.getComponent(0)).doClick();
+//
+//         }
+//      });
+//
+//      pnUpdateGrid.add(update_professor_no_check);
+//      pnUpdateGrid.add(update_professor_no);
+//      pnUpdateGrid.add(update_professor_name_check);
+//      pnUpdateGrid.add(update_professor_name);
+//      pnUpdateGrid.add(update_professor_address_check);
+//      pnUpdateGrid.add(update_professor_address);
+//      pnUpdateGrid.add(update_professor_phone_check);
+//      pnUpdateGrid.add(update_professor_phone);
+//      pnUpdateGrid.add(update_professor_email_check);
+//      pnUpdateGrid.add(update_professor_email);
+//      pnUpdateGrid.add(new JLabel("WHERE "));
+//      pnUpdateGrid.add(update_where);
+//      pnUpdateGrid.add(new JLabel(""));
+//      pnUpdateGrid.add(btnUpdate);
+//      pnUpdate.add("North", new JLabel("UPDATE professor SET"));
+//      pnUpdate.add("Center", pnUpdateGrid);
+
         JButton btnUpdate = new JButton("수정");
+        JTextField updateWhere = new JTextField();
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                try {
+                    stmt = con.createStatement();
+                    String query = "select max(professor_no) from professor";
+                    int professor_no = 1;
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        professor_no = rs.getInt(1) + 1;
+                    }
 
-                String query = "UPDATE professor SET ";
-                if (update_professor_no_check.isSelected()) {
-                    query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
+                    query = "UPDATE professor set professor_no = " + professor_no + " WHERE " + updateWhere.getText() ;
+
+
+                    stmt.execute(query);
+                    ((AbstractButton) pnBtn.getComponent(0)).doClick();
+                    //자동으로 소속테이블이 바껴야함, 지도테이블, 렉처테이블, 동아리교수 까지.
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                    showMessageDialog(null, "유효하지 않은 조건식입니다.");
+                    //return;
                 }
-                if (update_professor_name_check.isSelected()) {
-                    query += update_professor_name_check.getText() + " = '" + update_professor_name.getText() + "', ";
-                }
-                if (update_professor_address_check.isSelected()) {
-                    query += update_professor_address_check.getText() + " = '" + update_professor_address.getText()
-                            + "', ";
-                }
-                if (update_professor_phone_check.isSelected()) {
-                    query += update_professor_phone_check.getText() + " = '" + update_professor_phone.getText()
-                            + "' , ";
-                }
-                if (update_professor_email_check.isSelected()) {
-                    query += update_professor_email_check.getText() + " = '" + update_professor_email.getText() + "', ";
-                }
-                query = query.substring(0, query.length() - 2);
-                if (!update_where.getText().equals("")) {
-                    query += " WHERE " + update_where.getText();
-                }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(0)).doClick();
+
 
             }
         });
+        pnUpdate.add("North", new JLabel("UPDATE professor SET professor_no = MAX+1 WHERE"));
+        pnUpdate.add("Center", updateWhere);
+        pnUpdate.add("South", btnUpdate);
 
-        pnUpdateGrid.add(update_professor_no_check);
-        pnUpdateGrid.add(update_professor_no);
-        pnUpdateGrid.add(update_professor_name_check);
-        pnUpdateGrid.add(update_professor_name);
-        pnUpdateGrid.add(update_professor_address_check);
-        pnUpdateGrid.add(update_professor_address);
-        pnUpdateGrid.add(update_professor_phone_check);
-        pnUpdateGrid.add(update_professor_phone);
-        pnUpdateGrid.add(update_professor_email_check);
-        pnUpdateGrid.add(update_professor_email);
-        pnUpdateGrid.add(new JLabel("WHERE "));
-        pnUpdateGrid.add(update_where);
-        pnUpdateGrid.add(new JLabel(""));
-        pnUpdateGrid.add(btnUpdate);
-        pnUpdate.add("North", new JLabel("UPDATE professor SET"));
-        pnUpdate.add("Center", pnUpdateGrid);
 
         /* 삭제 */
         JTextField delete_where = new JTextField();
         JButton btnDelete = new JButton("삭제");
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM professor WHERE " + delete_where.getText()) == true) {
-                        JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
-                        ((AbstractButton) pnBtn.getComponent(0)).doClick();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
-                    }
+                //deleteFrom("DELETE FROM professor WHERE " + delete_where.getText());
+                try {
+                    stmt = con.createStatement();
+
+                    String query = "DELETE FROM professor WHERE " + delete_where.getText();
+                    System.out.println(query);
+                    stmt.execute(query);
+                    ((AbstractButton) pnBtn.getComponent(0)).doClick();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                    showMessageDialog(null, "유효한 조건식이 아닙니다.");
                 }
             }
         });
@@ -3395,110 +3629,299 @@ public class JC19011458_19011461 extends JFrame {
         /* 입력 */
         JPanel pnInsertGrid = new JPanel();
         pnInsertGrid.setLayout(new GridLayout(6, 2, 5, 5));
-        JTextField insert_department_no = new JTextField();
-        JTextField insert_department_name = new JTextField();
-        JTextField insert_department_contact = new JTextField();
-        JTextField insert_department_office = new JTextField();
-        JTextField insert_professor_no = new JTextField();
+        JTextField insertDepartmetnNo= new JTextField();
+        JTextField insertName = new JTextField();
+        JTextField insertContact = new JTextField();
+        JTextField insertOffice = new JTextField();
+        JTextField insertProfessorNo = new JTextField();
         JButton btnInsert = new JButton("입력");
-        btnInsert.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
 
         pnInsertGrid.add(new JLabel("department_no"));
-        pnInsertGrid.add(insert_department_no);
+        pnInsertGrid.add(insertDepartmetnNo);
         pnInsertGrid.add(new JLabel("department_name"));
-        pnInsertGrid.add(insert_department_name);
+        pnInsertGrid.add(insertName);
         pnInsertGrid.add(new JLabel("department_contact"));
-        pnInsertGrid.add(insert_department_contact);
+        pnInsertGrid.add(insertContact);
         pnInsertGrid.add(new JLabel("department_office"));
-        pnInsertGrid.add(insert_department_office);
-        pnInsertGrid.add(new JLabel("professor_no"));
-        pnInsertGrid.add(insert_professor_no);
+        pnInsertGrid.add(insertOffice);
+        pnInsertGrid.add(new JLabel("professor_no(학과장)"));
+        pnInsertGrid.add(insertProfessorNo);
         pnInsertGrid.add(new JLabel(""));
         pnInsertGrid.add(btnInsert);
         pnInsert.add("North", new JLabel("INSERT INTO department VALUES"));
         pnInsert.add("Center", pnInsertGrid);
+        btnInsert.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String departmentNo = insertDepartmetnNo.getText();
+                    String name = insertName.getText();
+                    String contact = insertContact.getText();
+                    String office = insertOffice.getText();
+                    String professorNo = insertProfessorNo.getText();
+
+
+                    //기본 사항
+                    if(departmentNo.isBlank()|| name.isBlank()|| contact.isBlank() || office.isBlank() || professorNo.isBlank()) {
+                        showMessageDialog(null, "모든 데이터를 입력하셔야합니다.");
+                        return;
+                    }
+                    //예외0: 학과 no가 정수가 아니거나 이미 잇는 경우
+                    if (!departmentNo.matches(regExp)) {
+                        showMessageDialog(null, "학과번호는 숫자만 입력 가능합니다.");
+                        return;
+                    }
+
+                    String query = "select EXISTS ( select * from department where department_no = " + departmentNo +")";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(rs.getBoolean(1)) {
+                            showMessageDialog(null, "이미 사용중인 학과 번호 입니다.");
+                            return;
+                        }
+                    }
+
+                    //예외1 : 이미 있는 학과 이름 인 경우
+                    //name = name.trim();
+                    name = name.replaceAll(" ", "");
+                    name = name.toUpperCase();
+                    System.out.println(name);
+                    stmt = con.createStatement();
+
+                    query = "select EXISTS (select * \r\n"
+                            + "            from department\r\n"
+                            + "            where department_name = '" + name + "')"  ;
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(rs.getBoolean(1)){
+                            showMessageDialog(null, "이미 존재하는 학과 이름입니다.");
+                            return;
+
+                        }
+                    }
+
+                    //예외2 : 해당 교수가 없는 경우
+                    query = "select EXISTS (select * \r\n"
+                            + "            from professor\r\n"
+                            + "            where professor_no = '" + professorNo + "');";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            showMessageDialog(null, "해당 id의 교수가 존재하지 않습니다.");
+                            return;
+                        }
+                    }
+
+
+                    // 학과개설 -> 소속테이블 변경 (학과장)
+                    query = "insert into department values (" + departmentNo + ",'" + name + "', '"
+                            + contact + "', '" + office + "', '" + professorNo + "')";
+                    stmt.execute(query);
+
+                    query = "insert into affiliated_professstudent values ("+ professorNo +","+ departmentNo +")";
+                    stmt.execute(query);
+
+                    showMessageDialog(null, "학과가 개설되었습니다.");
+                    ((AbstractButton) pnBtn.getComponent(1)).doClick();
+
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
 
         /* 수정 */
-        JPanel pnUpdateGrid = new JPanel();
-        pnUpdateGrid.setLayout(new GridLayout(7, 2, 5, 5));
-        JCheckBox update_department_no_check = new JCheckBox("department_no");
-        JCheckBox update_department_name_check = new JCheckBox("department_name");
-        JCheckBox update_department_contact_check = new JCheckBox("department_contact");
-        JCheckBox update_department_office_check = new JCheckBox("department_office");
-        JCheckBox update_professor_no_check = new JCheckBox("professor_no");
+//      JPanel pnUpdateGrid = new JPanel();
+//      pnUpdateGrid.setLayout(new GridLayout(7, 2, 5, 5));
+//      JCheckBox update_department_no_check = new JCheckBox("department_no");
+//      JCheckBox update_department_name_check = new JCheckBox("department_name");
+//      JCheckBox update_department_contact_check = new JCheckBox("department_contact");
+//      JCheckBox update_department_office_check = new JCheckBox("department_office");
+//      JCheckBox update_professor_no_check = new JCheckBox("professor_no");
+//
+//      JTextField update_department_no = new JTextField();
+//      JTextField update_department_name = new JTextField();
+//      JTextField update_department_contact = new JTextField();
+//      JTextField update_department_office = new JTextField();
+//      JTextField update_professor_no = new JTextField();
+//      JTextField update_where = new JTextField();
+//      JButton btnUpdate = new JButton("수정");
+//      btnUpdate.addActionListener(new ActionListener() {
+//         public void actionPerformed(ActionEvent e) {
+//
+//            String query = "UPDATE department SET ";
+//            if (update_department_no_check.isSelected()) {
+//               query += update_department_no_check.getText() + " = " + update_department_no.getText() + ", ";
+//            }
+//            if (update_department_name_check.isSelected()) {
+//               query += update_department_name_check.getText() + " = '" + update_department_name.getText() + "', ";
+//            }
+//            if (update_department_contact_check.isSelected()) {
+//               query += update_department_contact_check.getText() + " = '" + update_department_contact.getText() + "', ";
+//            }
+//            if (update_department_office_check.isSelected()) {
+//               query += update_department_office_check.getText() + " = '" + update_department_office.getText() + "', ";
+//            }
+//            if (update_professor_no_check.isSelected()) {
+//               query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
+//            }
+//            query = query.substring(0, query.length() - 2);
+//            if (!update_where.getText().equals("")) {
+//               query += " WHERE " + update_where.getText();
+//            }
+//            //updateSet(query);
+//            ((AbstractButton) pnBtn.getComponent(1)).doClick();
+//
+//         }
+//      });
+//
+//      pnUpdateGrid.add(update_department_no_check);
+//      pnUpdateGrid.add(update_department_no);
+//      pnUpdateGrid.add(update_department_name_check);
+//      pnUpdateGrid.add(update_department_name);
+//      pnUpdateGrid.add(update_department_contact_check);
+//      pnUpdateGrid.add(update_department_contact);
+//      pnUpdateGrid.add(update_department_office_check);
+//      pnUpdateGrid.add(update_department_office);
+//      pnUpdateGrid.add(update_professor_no_check);
+//      pnUpdateGrid.add(update_professor_no);
+//      pnUpdateGrid.add(new JLabel("WHERE "));
+//      pnUpdateGrid.add(update_where);
+//      pnUpdateGrid.add(new JLabel(""));
+//      pnUpdateGrid.add(btnUpdate);
 
-        JTextField update_department_no = new JTextField();
-        JTextField update_department_name = new JTextField();
-        JTextField update_department_contact = new JTextField();
-        JTextField update_department_office = new JTextField();
-        JTextField update_professor_no = new JTextField();
-        JTextField update_where = new JTextField();
         JButton btnUpdate = new JButton("수정");
+        JTextField updateWhere = new JTextField();
+
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                try {
+                    stmt = con.createStatement();
+                    String query = "select EXISTS (select * \r\n"
+                            + "            from department\r\n"
+                            + "            where professor_no = 21)";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            showMessageDialog(null, "현재 해당 교수가 존재하지 않습니다");
+                            return;
+                        }
+                    }
 
-                String query = "UPDATE department SET ";
-                if (update_department_no_check.isSelected()) {
-                    query += update_department_no_check.getText() + " = " + update_department_no.getText() + ", ";
+                    query = "UPDATE department set professor_no = 21 WHERE " + updateWhere.getText() ;
+
+                    stmt.execute(query);
+                    ((AbstractButton) pnBtn.getComponent(1)).doClick();
+                    //자동으로 소속테이블이 바껴야함, 지도테이블, 렉처테이블, 동아리교수 까지.
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                    showMessageDialog(null, "유효하지 않은 조건식입니다.");
+                    //return;
                 }
-                if (update_department_name_check.isSelected()) {
-                    query += update_department_name_check.getText() + " = '" + update_department_name.getText() + "', ";
-                }
-                if (update_department_contact_check.isSelected()) {
-                    query += update_department_contact_check.getText() + " = '" + update_department_contact.getText()
-                            + "', ";
-                }
-                if (update_department_office_check.isSelected()) {
-                    query += update_department_office_check.getText() + " = '" + update_department_office.getText()
-                            + "', ";
-                }
-                if (update_professor_no_check.isSelected()) {
-                    query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
-                }
-                query = query.substring(0, query.length() - 2);
-                if (!update_where.getText().equals("")) {
-                    query += " WHERE " + update_where.getText();
-                }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(1)).doClick();
+
 
             }
         });
 
-        pnUpdateGrid.add(update_department_no_check);
-        pnUpdateGrid.add(update_department_no);
-        pnUpdateGrid.add(update_department_name_check);
-        pnUpdateGrid.add(update_department_name);
-        pnUpdateGrid.add(update_department_contact_check);
-        pnUpdateGrid.add(update_department_contact);
-        pnUpdateGrid.add(update_department_office_check);
-        pnUpdateGrid.add(update_department_office);
-        pnUpdateGrid.add(update_professor_no_check);
-        pnUpdateGrid.add(update_professor_no);
-        pnUpdateGrid.add(new JLabel("WHERE "));
-        pnUpdateGrid.add(update_where);
-        pnUpdateGrid.add(new JLabel(""));
-        pnUpdateGrid.add(btnUpdate);
-        pnUpdate.add("North", new JLabel("UPDATE department SET"));
-        pnUpdate.add("Center", pnUpdateGrid);
+        pnUpdate.add("North", new JLabel("UPDATE department SET professor_no = 21 WHERE"));
+        pnUpdate.add("Center", updateWhere);
+        pnUpdate.add("South", btnUpdate);
+
 
         /* 삭제 */
         JTextField delete_where = new JTextField();
         JButton btnDelete = new JButton("삭제");
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM department WHERE " + delete_where.getText()) == true) {
-                        JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
-                        ((AbstractButton) pnBtn.getComponent(1)).doClick();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                //deleteFrom("DELETE FROM department WHERE " + delete_where.getText());
+                try {
+                    stmt = con.createStatement();
+                    String query = "select EXISTS (select * \r\n"
+                            + "            from department\r\n"
+                            + "            where " + delete_where.getText() +  ")";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            return;
+                        }
                     }
+
+                    query = "select department_no from department where " + delete_where.getText();
+                    rs = stmt.executeQuery(query);
+                    Vector<Integer> deleteDepartmentNo = new Vector<Integer>();
+                    while(rs.next()) {
+                        deleteDepartmentNo.add(rs.getInt(1));
+                    }
+
+
+                    query = "select EXISTS (select * \r\n"
+                            + "            from department\r\n"
+                            + "            where department_name = '임시학과')";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            int departmentNo = 1;
+                            query = "select max(department_no) from department";
+                            rs = stmt.executeQuery(query);
+                            if(rs.next()) {
+                                departmentNo = rs.getInt(1) + 1;
+                            }
+                            int professorNo = 1;
+                            query = "select min(professor_no) from professor";
+                            rs = stmt.executeQuery(query);
+                            if(rs.next()) {
+                                professorNo = rs.getInt(1);
+                            }
+                            query = "INSERT INTO department value (" + departmentNo + ",'임시학과','02-3408-1234','센808'," + professorNo + ")";
+                            stmt.execute(query);
+                            System.out.println(query);
+                        }
+                    }
+
+
+                    query = "select department_no from department where department_name = '임시학과'";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        int departmentNo = rs.getInt(1);
+
+                        //교수 소속 학과 변경해주기
+                        for(int i=0;i<deleteDepartmentNo.size();i++) {
+                            query = "UPDATE affiliated_professor SET department_no = "+ departmentNo  +" where department_no = " + deleteDepartmentNo.get(i);
+                            stmt.execute(query);
+                        }
+                        //lecture 주관학과 변경해주기
+                        for(int i=0;i<deleteDepartmentNo.size();i++) {
+                            query = "update lecture set department_no = " + departmentNo + " where department_no = " + deleteDepartmentNo.get(i);
+                            stmt.execute(query);
+                            System.out.println(query);
+
+                        }
+                        //학생 소속학과 변경해주기
+                        for(int i=0;i<deleteDepartmentNo.size();i++) {
+                            query = "update student set major_no = " + departmentNo + " where major_no = " + deleteDepartmentNo.get(i);
+                            stmt.execute(query);
+                            System.out.println(query);
+
+                        }
+
+                    }
+
+                    query = "DELETE FROM department where " + delete_where.getText();
+                    stmt.execute(query);
+                    System.out.println(query);
+                    //query = "UPDATE affiliated_professor set department_no = "+  +" where " + delete_where.getText();
+
+                    ((AbstractButton) pnBtn.getComponent(1)).doClick();
+
+                } catch (SQLException e1) {
+                    showMessageDialog(null, "유효하지 않은 조건식입니다.");
+                    e1.printStackTrace();
+                    return;
                 }
+
             }
         });
 
@@ -3538,6 +3961,60 @@ public class JC19011458_19011461 extends JFrame {
         JButton btnInsert = new JButton("입력");
         btnInsert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                String professorNo = insert_professor_no.getText();
+                String departmentNo = insert_department_no.getText();
+                //예외1 :  교수번호에 숫자가 아닌경우
+                if(!professorNo.matches(regExp)) {
+                    showMessageDialog(null, "교수번호는 숫자만 입력가능합니다.");
+                    return;
+                }
+                //예외2 :  학과번호가 숫자가 아닌경우
+                if(!departmentNo.matches(regExp)) {
+                    showMessageDialog(null, "학과번호는 숫자만 입력가능합니다.");
+                    return;
+                }
+                try {
+                    stmt = con.createStatement();
+                    String query = "select EXISTS (select * from professor where professor_no = " + professorNo + ")";
+                    rs = stmt.executeQuery(query);
+                    //예외3: 존재하지 않는 교수 || 학과인 경우
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            showMessageDialog(null, "존재하지 않는 교수입니다.");
+                            return;
+                        }
+                    }
+                    query = "select EXISTS (select * from department where department_no = " + departmentNo + ")";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(!rs.getBoolean(1)) {
+                            showMessageDialog(null, "존재하지 않는 학과입니다.");
+                            return;
+                        }
+                    }
+                    //예외4 : 이미 존재하는 정보인 경우
+                    query = "select exists (select *\r\n"
+                            + "            from affiliated_professor\r\n"
+                            + "            where professor_no = "+ professorNo +" and department_no = "+ departmentNo +")";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next()) {
+                        if(rs.getBoolean(1)) {
+                            showMessageDialog(null, "이미 존재하는 정보입니다.");
+                            return;
+                        }
+                    }
+
+                    //insert 실행
+                    query = "insert into affiliated_professor values(" + professorNo + ","+ departmentNo + ")";
+                    stmt.execute(query);
+
+
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                ((AbstractButton) pnBtn.getComponent(2)).doClick();
             }
         });
 
@@ -3551,58 +4028,75 @@ public class JC19011458_19011461 extends JFrame {
         pnInsert.add("Center", pnInsertGrid);
 
         /* 수정 */
-        JPanel pnUpdateGrid = new JPanel();
-        pnUpdateGrid.setLayout(new GridLayout(4, 2, 5, 5));
-        JCheckBox update_professor_no_check = new JCheckBox("professor_no");
-        JCheckBox update_department_no_check = new JCheckBox("department_no");
-        JTextField update_professor_no = new JTextField();
-        JTextField update_department_no = new JTextField();
-        JTextField update_where = new JTextField();
+        JTextField updateWhere = new JTextField();
         JButton btnUpdate = new JButton("수정");
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String query = "UPDATE affiliated_professor SET ";
-                if (update_professor_no_check.isSelected()) {
-                    query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
-                }
-                if (update_department_no_check.isSelected()) {
-                    query += update_department_no_check.getText() + " = " + update_department_no.getText() + ", ";
-                }
-                query = query.substring(0, query.length() - 2);
-                if (!update_where.getText().equals("")) {
-                    query += " WHERE " + update_where.getText();
-                }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(2)).doClick();
+                try {
+                    Vector<Integer[]> updateInfo = new Vector<Integer[]>();
+                    stmt = con.createStatement();
+                    String query = "select * from affiliated_professor";
+                    rs = stmt.executeQuery(query);
+                    //예외1 : 조건식에 만족하는 행이 없어서 업데이트할 필요가 없는 경우.
+                    while(rs.next()) {
+                        Integer[] tmp = new Integer[2];
+                        tmp[0] = rs.getInt(1);
+                        tmp[1] = rs.getInt(2);
+                        updateInfo.add(tmp);
+                    }
+                    if(updateInfo.isEmpty()) {
+                        showMessageDialog(null, "조건을 만족하는 데이터가 없습니다.");
+                        return;
+                    }
+                    //학과장을 제외하고 update
+                    Vector<Integer> headProfessor = new Vector<Integer>();
+                    Vector<Integer> remove = new Vector<Integer>();
+                    query = "select professor_no from department";
+                    rs = stmt.executeQuery(query);
+                    while(rs.next()) {
+                        headProfessor.add(rs.getInt(1));
+                    }
+                    for(int i=0;i<updateInfo.size();i++) {
+                        if(headProfessor.contains(updateInfo.get(i)[0])) {
+                            remove.add(i);
+                        }
+                    }
+                    for(int i=0;i<remove.size();i++) {
 
+                    }
+                    if(updateInfo.isEmpty()) {
+
+                    }
+
+
+
+
+
+
+
+
+
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    showMessageDialog(null, "유효하지 않은 조건문입니다.");
+                    e1.printStackTrace();
+                }
+                ((AbstractButton) pnBtn.getComponent(2)).doClick();
             }
         });
 
-        pnUpdateGrid.add(update_professor_no_check);
-        pnUpdateGrid.add(update_professor_no);
-        pnUpdateGrid.add(update_department_no_check);
-        pnUpdateGrid.add(update_department_no);
-        pnUpdateGrid.add(new JLabel("WHERE "));
-        pnUpdateGrid.add(update_where);
-        pnUpdateGrid.add(new JLabel(""));
-        pnUpdateGrid.add(btnUpdate);
-        pnUpdate.add("North", new JLabel("UPDATE affiliated_professor SET"));
-        pnUpdate.add("Center", pnUpdateGrid);
+        pnUpdate.add("North", new JLabel("UPDATE affiliated_professor SET department_no = MIN WHERE"));
+        pnUpdate.add("Center", updateWhere);
+        pnUpdate.add("South", btnUpdate);
 
         /* 삭제 */
         JTextField delete_where = new JTextField();
         JButton btnDelete = new JButton("삭제");
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM affiliated_professor WHERE " + delete_where.getText()) == true) {
-                        JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
-                        ((AbstractButton) pnBtn.getComponent(2)).doClick();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
+                //deleteFrom("DELETE FROM affiliated_professor WHERE " + delete_where.getText());
+                ((AbstractButton) pnBtn.getComponent(2)).doClick();
             }
         });
 
@@ -3658,26 +4152,6 @@ public class JC19011458_19011461 extends JFrame {
         JCheckBox update_student_account_check = new JCheckBox("student_account");
         JCheckBox update_major_no_check = new JCheckBox("major_no");
         JCheckBox update_minor_no_check = new JCheckBox("minor_no");
-        /* 전공과 부전공은 동시에 바꿔야 한다. */
-//        update_major_no_check.addItemListener(new ItemListener() {
-//            public void itemStateChanged(ItemEvent e) {
-//                if (update_major_no_check.isSelected()) {
-//                    JOptionPane.showMessageDialog(null, "전공/부전공 비교를 위해 함께 변경되어야 합니다.", "", JOptionPane.PLAIN_MESSAGE);
-//                    update_minor_no_check.setSelected(true);
-//                } else { // !update_major_no_check.isSelected()
-//                    update_minor_no_check.setSelected(false);
-//                }
-//            }
-//        });
-//        update_minor_no_check.addItemListener(new ItemListener() {
-//            public void itemStateChanged(ItemEvent e) {
-//                if (update_minor_no_check.isSelected()) {
-//                    update_major_no_check.setSelected(true);
-//                } else { // !update_minor_no_check.isSelected()
-//                    update_major_no_check.setSelected(false);
-//                }
-//            }
-//        });
 
         JTextField update_student_no = new JTextField();
         JTextField update_student_name = new JTextField();
@@ -3859,13 +4333,28 @@ public class JC19011458_19011461 extends JFrame {
         JButton btnDelete = new JButton("삭제");
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                try {
+                    String query = String.format("SELECT COUNT(professor_no) FROM tutoring WHERE professor_no IN (SELECT professor_no FROM tutoring WHERE student_no IN (SELECT student_no FROM student%s)) GROUP BY professor_no"
+                            , delete_where.getText().equals("") ? "" : " WHERE "+ delete_where.getText());
+                    System.out.println(query);
+                    stmt = con.createStatement();
+                    rs = stmt.executeQuery(query);
+                    while (rs.next()) {
+                        System.out.println(rs.getInt(1));
+                        if (rs.getInt(1) == 1) {
+                            JOptionPane.showMessageDialog(null, "조건식에 해당하는 학생의 지도교수 중 지도하는 학생이 한 명뿐인 교수가 있습니다.", "", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
                 int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM student WHERE " + delete_where.getText()) == true) {
+                    System.out.println("DELETE FROM student" + (delete_where.getText().equals("") ? "" : " WHERE " + delete_where.getText()));
+                    if (deleteFrom("DELETE FROM student" + (delete_where.getText().equals("") ? "" : " WHERE " + delete_where.getText().equals(""))) == true) {
                         JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
                         ((AbstractButton) pnBtn.getComponent(4)).doClick();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -3995,7 +4484,6 @@ public class JC19011458_19011461 extends JFrame {
                         JOptionPane.showMessageDialog(null, "삽입 실패 : " + e, "", JOptionPane.ERROR_MESSAGE);
                     }
                 }
-
             }
         });
 
@@ -4019,88 +4507,143 @@ public class JC19011458_19011461 extends JFrame {
         pnInsert.add("Center", pnInsertGrid);
 
         /* 수정 */
+
         JPanel pnUpdateGrid = new JPanel();
-        pnUpdateGrid.setLayout(new GridLayout(8, 2, 5, 5));
+        pnUpdateGrid.setLayout(new GridLayout(6, 2, 5, 5));
 
-//        JLabel update_student_no_check = new JLabel("student_no");
-        JLabel update_tuition_year_check = new JLabel("tuition_year");
-        JLabel update_tuition_semester_check = new JLabel("tuition_semester");
-        JCheckBox update_tuition_fee_check = new JCheckBox("tuition_fee");
-        JCheckBox update_tuition_payment_check = new JCheckBox("tuition_payment");
-        JCheckBox update_last_payment_date_check = new JCheckBox("last_payment_date");
-        JLabel update_grade_semester_check = new JLabel("grade_semester");
+        JLabel update_tuition_payment_check = new JLabel("tuition_payment");
+        JLabel update_last_payment_date_check = new JLabel("last_payment_date");
+        JLabel update_tuition_year_check = new JLabel("WHERE tuition_year = ");
+        JLabel update_tuition_semester_check = new JLabel("AND tuition_semester =");
 
-//        JTextField update_student_no = new JTextField();
-        JTextField update_tuition_year = new JTextField();
-        update_tuition_year.setEditable(false);
-        update_tuition_year.setText("최근 학기만 수정할 수 있습니다.");
-        JTextField update_tuition_semester = new JTextField();
-        update_tuition_semester.setEditable(false);
-        update_tuition_semester.setText("최근 학기만 수정할 수 있습니다.");
-        JTextField update_tuition_fee = new JTextField();
         JTextField update_tuition_payment = new JTextField();
         JTextField update_last_payment_date = new JTextField();
-        JTextField update_grade_semester = new JTextField();
-        update_grade_semester.setEditable(false);
-        update_grade_semester.setText("최근 학년 자동 계산");
+        JTextField update_tuition_year = new JTextField();
+        JTextField update_tuition_semester = new JTextField();
         JTextField update_where = new JTextField();
         JButton btnUpdate = new JButton("수정");
+
+        update_tuition_year.setEditable(false);
+        update_tuition_semester.setEditable(false);
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery("SELECT tuition_year, tuition_semester FROM tuition ORDER BY grade_semester DESC LIMIT 1");
+            rs.next();
+            update_tuition_year.setText(rs.getString(1));
+            update_tuition_semester.setText(rs.getString(2));
+        } catch (SQLException throwables) {
+            System.out.println("최근학기 조회 실패 : " + throwables);
+            throwables.printStackTrace();
+        }
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if ( !( update_tuition_payment.getText().equals("tuition_fee") || (update_tuition_payment.getText().matches(regExp)) ) ) {
+                    JOptionPane.showMessageDialog(null, "납부금액은 tuition_fee 또는 0이상의 숫자여야 합니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; //납부금액이 tuition_fee나 숫자가 아닐 때
+                }
+//                if (update_tuition_payment.getText().matches(regExp) && Integer.parseInt(update_tuition_payment.getText()) < 0) {
+//                    JOptionPane.showMessageDialog(null, "납부금액은 0이상의 숫자여야 합니다.", "", JOptionPane.ERROR_MESSAGE);
+//                    return; //납부금액 음수일 때
+//                }
+                if ((update_tuition_payment.getText().equals("0") && !update_last_payment_date.getText().equals("")) || (!update_tuition_payment.getText().equals("0") && update_last_payment_date.getText().equals(""))) {
+                    JOptionPane.showMessageDialog(null, "납부금액 또는 납부일자를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 납부금액이 0원인데 날짜 있음 / 납부했는데 날짜 없음
+                }
+                if (update_tuition_payment.getText().equals("tuition_fee") && update_last_payment_date.getText().equals("")) {
+                    JOptionPane.showMessageDialog(null, "납부금액 또는 납부일자를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 납부했는데 날짜 없음
+                }
+                if (!update_last_payment_date.getText().equals("") && isValidDate(update_last_payment_date.getText()) == false) {
+                    JOptionPane.showMessageDialog(null, "납부일자를 확인해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 날짜 형식이 유효하지 않을 때
+                }
+                if (!update_last_payment_date.getText().equals("") && isDeadline(update_last_payment_date.getText(), update_tuition_year.getText(), update_tuition_semester.getText()) == false) {
+                    JOptionPane.showMessageDialog(null, "납부기간이 아닙니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 납부 기간이 아닐 때 (2021년 1학기 등록인데 등록금 납부 일자가 2021년 02월이 아닐 때, 납부를 하지 않으면 수강신청을 할 수 없기 때문에 등록은 의미 없음)
+                }
 
-                String query = "UPDATE tuition SET ";
-                if (update_tuition_fee_check.isSelected()) {
-                    if (update_tuition_fee_check.getText().equals("")) {
-                        JOptionPane.showMessageDialog(null, "고지금액을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                // 업데이트 가능한 경우 : 가장 최근 학기에 등록이 된 경우, 조건식 없고 tuition_payment 가 fee
+                // 업데이트 가능한 경우 : 가장 최근 학기에 등록이 된 경우, student_no 1 명이면 tuition_payment가 fee를 넘지 않음
+                // 업데이트 가능한 경우 : 가장 최근 학기에 등록이 된 경우, 여러 명이면 tuition_payment가 tuition_fee
+                // 업데이트 가능한 경우 : 가장 최근 학기에 등록이 된 경우, student_no 0 상관 없음
+                if (update_where.getText().equals("")) {  // 조건식 없음
+                    if (!update_tuition_payment.getText().equals("tuition_fee")) {
+                        JOptionPane.showMessageDialog(null, "조건식이 없는 경우 tuition_payment는 tuition_fee만 입력가능합니다", "", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    query += update_tuition_fee_check.getText() + " = " + update_tuition_fee.getText() + ", ";
-                }
-                if (update_tuition_payment_check.isSelected()) {
-                    if (update_tuition_payment_check.getText().equals("")) {
-                        JOptionPane.showMessageDialog(null, "납부금액을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
-                        return;
+                } else { // 조건식 있음
+                    int studentCnt = 0;
+                    try {
+                        String query = String.format("SELECT COUNT(student_no) FROM tuition WHERE tuition_year = %s AND tuition_semester = %s AND %s", update_tuition_year.getText(), update_tuition_semester.getText(), update_where.getText());
+                        stmt = con.createStatement();
+                        rs = stmt.executeQuery(query);
+                        rs.next();
+                        studentCnt = rs.getInt(1);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
                     }
-                    query += update_tuition_payment_check.getText() + " = " + update_tuition_payment.getText() + ", ";
-                }
-                if (update_last_payment_date_check.isSelected()) {
-                    if (update_last_payment_date_check.getText().equals("")) {
-                        JOptionPane.showMessageDialog(null, "납부날짜를 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    query += update_last_payment_date_check.getText() + " = '" + update_last_payment_date.getText() + "', ";
-                }
-                query = query.substring(0, query.length() - 2);
-                if (!update_where.getText().equals("")) {
-                    query += " WHERE " + update_where.getText();
-                }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(5)).doClick();
 
+                    if (studentCnt == 0) {  // 조건식에 해당하는 학생 없음
+                        // 해당 하는 학생 없음
+                    } else if (studentCnt == 1) {   //조건식에 해당하는 학생 1명
+                        int update_tuition_fee = 0;
+                        try {   // 고지금액이 얼만지 확인
+                            String query = String.format("SELECT tuition_fee, tuition_payment FROM tuition WHERE tuition_year = %s AND tuition_semester = %s AND %s", update_tuition_year.getText(), update_tuition_semester.getText(), update_where.getText());
+                            stmt = con.createStatement();
+                            rs = stmt.executeQuery(query);
+                            rs.next();
+                            update_tuition_fee = rs.getInt(1);
+                            if (!update_tuition_payment.getText().equals("tuition_fee") && !(Integer.parseInt(update_tuition_payment.getText()) == update_tuition_fee) && update_tuition_fee == rs.getInt(2)) {
+                                JOptionPane.showMessageDialog(null, "이미 등록금을 완납했습니다. 수강취소 및 등록금 환불을 이용하세요", "", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                        if (!update_tuition_payment.getText().equals("tuition_fee") && Integer.parseInt(update_tuition_payment.getText()) > update_tuition_fee) {
+                            JOptionPane.showMessageDialog(null, "납부금액은 고지금액을 초과할 수 없습니다. (고지금액 : " + update_tuition_fee + ")", "", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    } else {    //조건식에 해당하는 사람 여러 명
+                        if (!update_tuition_payment.getText().equals("tuition_fee")) {
+                            JOptionPane.showMessageDialog(null, "조건식에 해당하는 학생이 여러명인 경우 tuition_payment에는 tuition_fee만 입력가능합니다.", "", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                }
+                int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    String query = "UPDATE tuition SET ";
+                    query += "tuition_payment = " + update_tuition_payment.getText();
+                    query += ", last_payment_date = '" + update_last_payment_date.getText() + "'";
+                    query += " WHERE tuition_year = " + update_tuition_year.getText() + " AND tuition_semester = " + update_tuition_semester.getText();
+                    if (!update_where.getText().equals("")){
+                        query += " AND " + update_where.getText();
+                    }
+                    System.out.println(query);
+                    if (updateSet(query)) {
+                        JOptionPane.showMessageDialog(null, "실행이 정상적으로 종료하였습니다.", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(5)).doClick();
+                    }
+                }
             }
         });
 
-//        pnUpdateGrid.add(update_student_no_check);
-//        pnUpdateGrid.add(update_student_no);
-        pnUpdateGrid.add(update_tuition_year_check);
-        pnUpdateGrid.add(update_tuition_year);
-        pnUpdateGrid.add(update_tuition_semester_check);
-        pnUpdateGrid.add(update_tuition_semester);
-        pnUpdateGrid.add(update_tuition_fee_check);
-        pnUpdateGrid.add(update_tuition_fee);
         pnUpdateGrid.add(update_tuition_payment_check);
         pnUpdateGrid.add(update_tuition_payment);
         pnUpdateGrid.add(update_last_payment_date_check);
         pnUpdateGrid.add(update_last_payment_date);
-        pnUpdateGrid.add(update_grade_semester_check);
-        pnUpdateGrid.add(update_grade_semester);
-        pnUpdateGrid.add(new JLabel("WHERE "));
+        pnUpdateGrid.add(update_tuition_year_check);
+        pnUpdateGrid.add(update_tuition_year);
+        pnUpdateGrid.add(update_tuition_semester_check);
+        pnUpdateGrid.add(update_tuition_semester);
+        pnUpdateGrid.add(new JLabel("AND "));
         pnUpdateGrid.add(update_where);
         pnUpdateGrid.add(new JLabel(""));
         pnUpdateGrid.add(btnUpdate);
         pnUpdate.add("North", new JLabel("UPDATE tuition SET"));
         pnUpdate.add("Center", pnUpdateGrid);
-        pnUpdate.add("South", new JLabel("조건식에는 student_no에 대한 정보가 포함되어야 합니다.(빈칸 가능)"));
+        pnUpdate.add("South", new JLabel(""));
 
         /* 삭제 */
         JPanel pnDeleteNorth = new JPanel();
@@ -4167,28 +4710,6 @@ public class JC19011458_19011461 extends JFrame {
         banInsert.setHorizontalAlignment(JLabel.CENTER);
         pnInsert.add("Center", banInsert);
 
-//		JPanel pnInsertGrid = new JPanel();
-//		pnInsertGrid.setLayout(new GridLayout(4, 2, 5, 5));
-//		JTextField insert_student_no = new JTextField();
-//		JTextField insert_professor_no = new JTextField();
-//		JTextField insert_grade_semester = new JTextField();
-//		JButton btnInsert = new JButton("입력");
-//		btnInsert.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//			}
-//		});
-//
-//		pnInsertGrid.add(new JLabel("student_no"));
-//		pnInsertGrid.add(insert_student_no);
-//		pnInsertGrid.add(new JLabel("professor_no"));
-//		pnInsertGrid.add(insert_professor_no);
-//		pnInsertGrid.add(new JLabel("grade_semester"));
-//		pnInsertGrid.add(insert_grade_semester);
-//		pnInsertGrid.add(new JLabel(""));
-//		pnInsertGrid.add(btnInsert);
-//		pnInsert.add("North", new JLabel("INSERT INTO tutoring VALUES"));
-//		pnInsert.add("Center", pnInsertGrid);
-
         /* 수정 */
         JPanel pnUpdateGrid = new JPanel();
         pnUpdateGrid.setLayout(new GridLayout(4, 2, 5, 5));
@@ -4227,10 +4748,14 @@ public class JC19011458_19011461 extends JFrame {
                     return; // 존재하지 않는 학번일 때
                 }
 
-
                 String query = "UPDATE tutoring SET professor_no = " + update_professor_no.getText() + ", grade_semester = '" + update_grade_semester.getText() + "' WHERE student_no = " + update_student_no.getText();
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(6)).doClick();
+                int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    if (updateSet(query) == true) {
+                        JOptionPane.showMessageDialog(null, "수정 성공", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(6)).doClick();
+                    }
+                }
             }
         });
 
@@ -4244,6 +4769,7 @@ public class JC19011458_19011461 extends JFrame {
         pnUpdateGrid.add(btnUpdate);
         pnUpdate.add("North", new JLabel("UPDATE tutoring SET"));
         pnUpdate.add("Center", pnUpdateGrid);
+        pnUpdate.add("South", new JLabel("조건식에는 학생을 한 명만 입력해주세요 (학년계산 필요)"));
 
         /* 삭제 */
         JLabel banDelete = new JLabel("학생 삭제시 자동으로 삭제됩니다.");
@@ -4277,7 +4803,302 @@ public class JC19011458_19011461 extends JFrame {
 
     }
 
-    //	public JPanel adminAdministrationCourse(JPanel pnHeader) { }
+    public JPanel adminAdministrationCourse(JPanel pnHeader) {
+        c.remove(pnCenter);
+        pnCenter.removeAll();
+        pnCenter.add("North", pnHeader);
+        pnCenter.add("South", showTableCourse());
+        JPanel pnBtn = (JPanel) pnHeader.getComponent(1);
+
+        JPanel pnContent = new JPanel();
+        pnContent.setLayout(new GridLayout(1, 3, 5, 5));
+        JPanel pnInsert = new JPanel();
+        pnInsert.setLayout(new BorderLayout());
+        JPanel pnUpdate = new JPanel();
+        pnUpdate.setLayout(new BorderLayout());
+        JPanel pnDelete = new JPanel();
+        pnDelete.setLayout(new BorderLayout());
+
+        /* 입력 */
+        JPanel pnInsertGrid = new JPanel();
+        pnInsertGrid.setLayout(new GridLayout(9, 2, 5, 5));
+
+        JTextField insert_lecture_no = new JTextField();
+        JTextField insert_student_no = new JTextField();
+        JTextField insert_attendance_score = new JTextField();
+        insert_attendance_score.setEditable(false);
+        JTextField insert_midterm_score = new JTextField();
+        insert_midterm_score.setEditable(false);
+        JTextField insert_finals_score = new JTextField();
+        insert_finals_score.setEditable(false);
+        JTextField insert_other_score = new JTextField();
+        insert_other_score.setEditable(false);
+        JTextField insert_total_score = new JTextField();
+        insert_total_score.setEditable(false);
+        JTextField insert_grade = new JTextField();
+        insert_grade.setEditable(false);
+        JButton btnInsert = new JButton("입력");
+        btnInsert.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (selectLectureNo().contains(" " + insert_lecture_no.getText() + " ") == false) {
+                    JOptionPane.showMessageDialog(null, "존재하지 않는 수업입니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 존재하지 않는 수업일 때
+                }
+                if (selectStudentNo().contains(" " + insert_student_no.getText() + " ") == false) {
+                    JOptionPane.showMessageDialog(null, "존재하지 않는 학번입니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 존재하지 않는 수업일 때
+                }
+                if (isInClass(insert_lecture_no.getText(), insert_student_no.getText()) == true) {
+                    JOptionPane.showMessageDialog(null, "이미 수강중인 강의입니다.", "", JOptionPane.ERROR_MESSAGE);
+                    return; // 이미 수강중인 강의일때
+                }
+                try {
+                    stmt = con.createStatement();
+                    rs = stmt.executeQuery("SELECT lecture_year, lecture_semester FROM lecture WHERE lecture_no = " + insert_lecture_no.getText());
+                    rs.next();
+                    if(didEnroll(insert_student_no.getText(), rs.getString(1), rs.getString(2)) == false) {
+                        JOptionPane.showMessageDialog(null, "해당 과목의 학기에 등록하지 않았거나 등록금이 미납되어있습니다.", "", JOptionPane.ERROR_MESSAGE);
+                        return; // 수업에 해당하는 학기에 등록하지 않았을 때
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                // 시간 겹치는지 확인
+                String newLectureDay1 = "", newLectureDay2 = "", newLectureYear = "", newLectureSemester = "";
+                String[] newLecturePeriod1 = null;
+                String[] newLecturePeriod2 = null;
+                // 새로 신청할 강의 정보
+                try {
+                    stmt = con.createStatement();
+                    rs = stmt.executeQuery("SELECT lecture_year, lecture_semester, lecture_day1, lecture_period1, lecture_day2, lecture_period2 FROM lecture WHERE lecture_no = " + insert_lecture_no.getText());
+                    rs.next();
+                    newLectureYear = rs.getString(1);
+                    newLectureSemester = rs.getString(2);
+                    newLectureDay1 = rs.getString(3);
+                    newLecturePeriod1 = rs.getString(4).split(",");
+                    newLectureDay2 = rs.getString(5);
+                    newLecturePeriod2 = rs.getString(6).split(",");
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                // 기존 수강신청 된 강의 정보와 비교
+                try {
+                    String query = String.format("SELECT l.lecture_day1, l.lecture_period1, l.lecture_day2, l.lecture_period2 FROM course c LEFT JOIN lecture l ON l.lecture_no = c.lecture_no WHERE c.student_no = %s AND l.lecture_year = %s AND l.lecture_semester = %s AND (l.lecture_day1 = '%s' OR l.lecture_day2 = '%s')", insert_student_no.getText(), newLectureYear, newLectureSemester, newLectureDay1, newLectureDay2);
+                    stmt = con.createStatement();
+                    rs = stmt.executeQuery(query);
+                    while (rs.next()) {
+                        String lectureDay1 = rs.getString(1);
+                        String lecturePeriod1 = rs.getString(2);
+                        String lectureDay2 = rs.getString(3);
+                        String lecturePeriod2 = rs.getString(4);
+                        String[] period1 =  lecturePeriod1.split(",");
+                        String[] period2 = lecturePeriod2.split(",");
+
+                        // 새로운 강의 요일1과 비교
+                        if (!newLectureDay1.equals("") && newLectureDay1.equals(lectureDay1)) {
+                            for (int i=0; i<period1.length; i++) {
+                                for (int j=0; j<newLecturePeriod1.length; j++) {
+                                    if(period1[i].equals(newLecturePeriod1[j])) {
+                                        JOptionPane.showMessageDialog(null, "기존 과목과 시간이 겹칩니다.", "", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        if (!newLectureDay1.equals("") && newLectureDay1.equals(lectureDay2)) {
+                            for (int i=0; i<period2.length; i++) {
+                                for (int j=0; j<newLecturePeriod1.length; j++) {
+                                    if(period2[i].equals(newLecturePeriod1[j])) {
+                                        JOptionPane.showMessageDialog(null, "기존 과목과 시간이 겹칩니다.", "", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        // 새로운 강의 요일2와 비교
+                        if (!newLectureDay2.equals("") && newLectureDay2.equals(lectureDay1)) {
+                            for (int i=0; i<period1.length; i++) {
+                                for (int j=0; j<newLecturePeriod2.length; j++) {
+                                    if(period1[i].equals(newLecturePeriod2[j])) {
+                                        JOptionPane.showMessageDialog(null, "기존 과목과 시간이 겹칩니다.", "", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        if (!newLectureDay2.equals("") && newLectureDay2.equals(lectureDay2)) {
+                            for (int i=0; i<period2.length; i++) {
+                                for (int j=0; j<newLecturePeriod2.length; j++) {
+                                    if(period2[i].equals(newLecturePeriod2[j])) {
+                                        JOptionPane.showMessageDialog(null, "기존 과목과 시간이 겹칩니다.", "", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    try {
+                        stmt = con.createStatement();
+                        String query = String.format("INSERT INTO course VALUES(%s, %s, '', '', '', '', '', '')", insert_lecture_no.getText(), insert_student_no.getText());
+                        System.out.println(query);
+                        stmt.execute(query);
+                        JOptionPane.showMessageDialog(null, "입력 성공", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(7)).doClick();
+                    } catch (SQLException ex) {
+                        System.out.println("수강 신청 실패 :" + ex);
+                    }
+                }
+            }
+        });
+
+        pnInsertGrid.add(new JLabel("lecture_no"));
+        pnInsertGrid.add(insert_lecture_no);
+        pnInsertGrid.add(new JLabel("student_no"));
+        pnInsertGrid.add(insert_student_no);
+        pnInsertGrid.add(new JLabel("attendance_score"));
+        pnInsertGrid.add(insert_attendance_score);
+        pnInsertGrid.add(new JLabel("midterm_score"));
+        pnInsertGrid.add(insert_midterm_score);
+        pnInsertGrid.add(new JLabel("finals_score"));
+        pnInsertGrid.add(insert_finals_score);
+        pnInsertGrid.add(new JLabel("other_score"));
+        pnInsertGrid.add(insert_other_score);
+        pnInsertGrid.add(new JLabel("total_score"));
+        pnInsertGrid.add(insert_total_score);
+        pnInsertGrid.add(new JLabel("grade"));
+        pnInsertGrid.add(insert_grade);
+        pnInsertGrid.add(new JLabel(""));
+        pnInsertGrid.add(btnInsert);
+        pnInsert.add("North", new JLabel("INSERT INTO course VALUES"));
+        pnInsert.add("Center", pnInsertGrid);
+
+        /* 수정 */
+        JPanel pnUpdateGrid = new JPanel();
+        pnUpdateGrid.setLayout(new GridLayout(10, 2, 5, 5));
+        JLabel update_attendance_score_check = new JLabel("attendance_score");
+        JLabel update_midterm_score_check = new JLabel("midterm_score");
+        JLabel update_finals_score_check = new JLabel("finals_score");
+        JLabel update_other_score_check = new JLabel("other_score");
+        JLabel update_total_score_check = new JLabel("total_score");
+        JLabel update_grade_check = new JLabel("grade");
+        JLabel update_lecture_no_check = new JLabel("lecture_no");
+        JLabel update_student_no_check = new JLabel("student_no");
+
+        JTextField update_attendance_score = new JTextField();
+        JTextField update_midterm_score = new JTextField();
+        JTextField update_finals_score = new JTextField();
+        JTextField update_other_score = new JTextField();
+        JTextField update_total_score = new JTextField();
+        update_total_score.setEditable(false);
+        update_total_score.setText("자동으로 계산됩니다.");
+        JTextField update_grade = new JTextField();
+        JTextField update_lecture_no = new JTextField();
+        JTextField update_student_no = new JTextField();
+        JButton btnUpdate = new JButton("수정");
+        btnUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (!update_attendance_score.getText().equals("") && (Double.parseDouble(update_attendance_score.getText()) < 0 || Double.parseDouble(update_attendance_score.getText()) > 100.0)) {
+                        JOptionPane.showMessageDialog(null, "0~100점으로 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+                        return;
+                    }
+                    if (!update_midterm_score.getText().equals("") && (Double.parseDouble(update_midterm_score.getText()) < 0 || Double.parseDouble(update_midterm_score.getText()) > 100.0)) {
+                        JOptionPane.showMessageDialog(null, "0~100점으로 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+                        return;
+                    }
+                    if (!update_finals_score.getText().equals("") && (Double.parseDouble(update_finals_score.getText()) < 0 || Double.parseDouble(update_finals_score.getText()) > 100.0)) {
+                        JOptionPane.showMessageDialog(null, "0~100점으로 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+                        return;
+                    }if (!update_other_score.getText().equals("") && (Double.parseDouble(update_other_score.getText()) < 0 || Double.parseDouble(update_other_score.getText()) > 100.0)) {
+                        JOptionPane.showMessageDialog(null, "0~100점으로 입력해주세요", "", JOptionPane.PLAIN_MESSAGE);
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "숫자만 입력할 수 있습니다..", "", JOptionPane.PLAIN_MESSAGE);
+                        return;
+                }
+
+                update_total_score.setText(calculateTotalScore(update_midterm_score.getText(), update_finals_score.getText(), update_other_score.getText(), update_attendance_score.getText()));
+                if (!(update_grade.getText().equals("A+") || update_grade.getText().equals("A") || update_grade.getText().equals("B+")
+                        || update_grade.getText().equals("B") || update_grade.getText().equals("C+")
+                        || update_grade.getText().equals("C") || update_grade.equals("D+") || update_grade.getText().equals("D")
+                        || update_grade.getText().equals("F") || update_grade.getText().equals("FA")
+                        || update_grade.getText().equals("P") || update_grade.getText().equals("NP")
+                        || update_grade.getText().equals(""))) {
+                    JOptionPane.showMessageDialog(null, "평점을 확인해주세요.", "", JOptionPane.PLAIN_MESSAGE);
+                    return;
+                }
+                String query = "UPDATE course SET ";
+                query += update_attendance_score_check.getText() + " = " + (update_attendance_score.getText().equals("") ? "''" : update_attendance_score.getText()) + ", ";
+                query += update_midterm_score_check.getText() + " = " + (update_midterm_score.getText().equals("") ? "''" : update_midterm_score.getText()) + ", ";
+                query += update_finals_score_check.getText() + " = " + (update_finals_score.getText().equals("") ? "''" : update_finals_score.getText()) + ", ";query += update_other_score_check.getText() + " = " + (update_other_score.getText().equals("") ? "''" : update_other_score.getText()) + ", ";
+                query += update_total_score_check.getText() + " = " + (update_total_score.getText().equals("") ? "''" : update_total_score.getText()) + ", ";
+                query += update_grade_check.getText() + " = " + (update_grade.getText().equals("") ? "''" : "'" + update_grade.getText() + "'");
+                query += " WHERE lecture_no = " + update_lecture_no.getText() + " AND student_no = " + update_student_no.getText();
+                System.out.println(query);
+                int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    if (updateSet(query) == true) {
+                        JOptionPane.showMessageDialog(null, "수정 성공", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(7)).doClick();
+                    }
+                }
+            }
+        });
+
+        pnUpdateGrid.add(update_attendance_score_check);
+        pnUpdateGrid.add(update_attendance_score);
+        pnUpdateGrid.add(update_midterm_score_check);
+        pnUpdateGrid.add(update_midterm_score);
+        pnUpdateGrid.add(update_finals_score_check);
+        pnUpdateGrid.add(update_finals_score);
+        pnUpdateGrid.add(update_other_score_check);
+        pnUpdateGrid.add(update_other_score);
+        pnUpdateGrid.add(update_total_score_check);
+        pnUpdateGrid.add(update_total_score);
+        pnUpdateGrid.add(update_grade_check);
+        pnUpdateGrid.add(update_grade);
+        pnUpdateGrid.add(update_lecture_no_check);
+        pnUpdateGrid.add(update_lecture_no);
+        pnUpdateGrid.add(update_student_no_check);
+        pnUpdateGrid.add(update_student_no);
+        pnUpdateGrid.add(new JLabel(""));
+        pnUpdateGrid.add(btnUpdate);
+        pnUpdate.add("North", new JLabel("UPDATE course SET"));
+        pnUpdate.add("Center", pnUpdateGrid);
+
+        /* 삭제 */
+        JTextField delete_where = new JTextField();
+        JButton btnDelete = new JButton("삭제");
+        btnDelete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    if (deleteFrom("DELETE FROM club WHERE " + delete_where.getText()) == true) {
+                        JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(7)).doClick();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "삭제 실패 :" + e, "", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        pnDelete.add("North", new JLabel("DELETE FROM course WHERE"));
+        pnDelete.add("Center", delete_where);
+        pnDelete.add("South", btnDelete);
+
+        pnContent.add(pnInsert);
+        pnContent.add(pnUpdate);
+        pnContent.add(pnDelete);
+        pnCenter.add("Center", pnContent);
+        return pnCenter;
+    }
+
     public JPanel adminAdministrationClub(JPanel pnHeader) {
         c.remove(pnCenter);
         pnCenter.removeAll();
@@ -4294,6 +5115,7 @@ public class JC19011458_19011461 extends JFrame {
         JPanel pnDelete = new JPanel();
         pnDelete.setLayout(new BorderLayout());
 
+        /* 입력 */
         JPanel pnInsertGrid = new JPanel();
         pnInsertGrid.setLayout(new GridLayout(7, 2, 5, 5));
         JTextField insert_club_no = new JTextField();
@@ -4309,10 +5131,14 @@ public class JC19011458_19011461 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (selectClubNo().contains(" " + insert_club_no.getText() + " ") == true) {
                     JOptionPane.showMessageDialog(null, "이미 존재하는 동아리입니다.", "", JOptionPane.ERROR_MESSAGE);
-                    return; // 존재하지 않는 동아리 번호일 때
+                    return; // 존재하는 동아리 번호일 때
                 }
-                if (insert_club_name.getText().equals("")) {
+                if (insert_club_name.getText().trim().equals("")) {
                     JOptionPane.showMessageDialog(null, "동아리명을 입력해주세요.", "", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (insert_club_room.getText().trim().equals("")) {
+                    JOptionPane.showMessageDialog(null, "동아리실을 입력해주세요.", "", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (selectProfessorNo().contains(" " + insert_professor_no.getText() + " ") == false) {
@@ -4340,7 +5166,7 @@ public class JC19011458_19011461 extends JFrame {
                     try {
                         /* 동아리 회장은 자동으로 club_join에 추가 */
                         stmt = con.createStatement();
-                        String query = String.format("INSERT INTO club_join VALUES(%s, '%s')", insert_student_no.getText(), insert_club_no.getText());
+                        String query = String.format("INSERT INTO club_join VALUES(%s, %s)", insert_student_no.getText(), insert_club_no.getText());
                         System.out.println(query);
                         stmt.execute(query);
                         JOptionPane.showMessageDialog(null, "실행이 정상적으로 종료하였습니다.", "", JOptionPane.PLAIN_MESSAGE);
@@ -4395,6 +5221,10 @@ public class JC19011458_19011461 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String query = "UPDATE club SET ";
                 if (update_club_no_check.isSelected()) {
+                    if (update_club_no.getText().matches(regExp)) {
+                        JOptionPane.showMessageDialog(null, "동아리 번호를 입력하거나 체크를 해제하세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_club_no_check.getText() + " = " + update_club_no.getText() + ", ";
                     if (selectClubNo().contains(" " + update_club_no.getText() + " ") == true) {
                         JOptionPane.showMessageDialog(null, "이미 존재하는 동아리입니다.", "", JOptionPane.ERROR_MESSAGE);
@@ -4402,32 +5232,66 @@ public class JC19011458_19011461 extends JFrame {
                     }
                 }
                 if (update_club_name_check.isSelected()) {
+                    if (update_club_name.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "동아리이름을 입력하거나 체크를 해제하세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_club_name_check.getText() + " = '" + update_club_name.getText() + "', ";
                 }
                 if (update_club_room_check.isSelected()) {
+                    if (update_club_room.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "동아리실을 입력하거나 체크를 해제하세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     query += update_club_room_check.getText() + " = '" + update_club_room.getText() + "', ";
                 }
                 if (update_professor_no_check.isSelected()) {
-                    query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
+                    if (update_professor_no.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "직번을 입력하거나 체크를 해제하세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     if (selectProfessorNo().contains(" " + update_professor_no.getText() + " ") == false) {
                         JOptionPane.showMessageDialog(null, "존재하지 않는 직번입니다.", "", JOptionPane.ERROR_MESSAGE);
                         return; // 존재하지 않는 직번일 때
                     }
+                    query += update_professor_no_check.getText() + " = " + update_professor_no.getText() + ", ";
                 }
                 if (update_student_no_check.isSelected()) {
-                    query += update_student_no_check.getText() + " = " + update_student_no.getText() + ", ";
+                    if (update_student_no.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "학번을 입력하거나 체크를 해제하세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     if (selectStudentNo().contains(" " + update_student_no.getText() + " ") == false) {
                         JOptionPane.showMessageDialog(null, "존재하지 않는 학번입니다.", "", JOptionPane.ERROR_MESSAGE);
                         return; // 존재하지 않는 학번일 때
                     }
+                    query += update_student_no_check.getText() + " = " + update_student_no.getText() + ", ";
                 }
-
+                if (update_where.getText().equals("")) {
+                    JOptionPane.showMessageDialog(null, "조건식을 입력해주세요", "", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    String query1 = String.format("SELECT COUNT(club_no) FROM club WHERE %s", update_where.getText());
+                    stmt = con.createStatement();
+                    rs = stmt.executeQuery(query1);
+                    rs.next();
+                    if (rs.getInt(1) > 1) {
+                        JOptionPane.showMessageDialog(null, "조건식은 동아리 하나만 입력해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
                 query = query.substring(0, query.length() - 2);
-                if (!update_where.getText().equals("")) {
-                    query += " WHERE " + update_where.getText();
+                query += " WHERE " + update_where.getText();
+                int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    if (updateSet(query) == true) {
+                        JOptionPane.showMessageDialog(null, "수정 성공", "", JOptionPane.PLAIN_MESSAGE);
+                        ((AbstractButton) pnBtn.getComponent(8)).doClick();
+                    }
                 }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(8)).doClick();
             }
         });
 
@@ -4445,7 +5309,7 @@ public class JC19011458_19011461 extends JFrame {
         pnUpdateGrid.add(update_student_no);
         pnUpdateGrid.add(update_where_check);
         pnUpdateGrid.add(update_where);
-        pnUpdateGrid.add(new JLabel(""));
+        pnUpdateGrid.add(new JLabel("조건식은 동아리 하나만 입력해주세요"));
         pnUpdateGrid.add(btnUpdate);
         pnUpdate.add("North", new JLabel("UPDATE club SET"));
         pnUpdate.add("Center", pnUpdateGrid);
@@ -4476,7 +5340,6 @@ public class JC19011458_19011461 extends JFrame {
         pnContent.add(pnDelete);
         pnCenter.add("Center", pnContent);
         return pnCenter;
-
     }
 
     public JPanel adminAdministrationClubJoin(JPanel pnHeader) {
@@ -4576,8 +5439,11 @@ public class JC19011458_19011461 extends JFrame {
                 if (!update_where.getText().equals("")) {
                     query += " WHERE " + update_where.getText();
                 }
-                updateSet(query);
-                ((AbstractButton) pnBtn.getComponent(9)).doClick();
+
+                int result = JOptionPane.showConfirmDialog(null, "수정 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    updateSet(query);
+                }
 
                 /* 동아리장이 동아리 명단에 없는 동아리 찾아서 수정 */
                 Map<String, String> studentNO_clubNo = new HashMap<>();
@@ -4631,7 +5497,6 @@ public class JC19011458_19011461 extends JFrame {
                 }
                 JOptionPane.showMessageDialog(null, "삭제가 완료되었습니다.", "", JOptionPane.PLAIN_MESSAGE);
                 ((AbstractButton) pnBtn.getComponent(9)).doClick();
-
             }
         });
 
