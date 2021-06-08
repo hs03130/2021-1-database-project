@@ -482,13 +482,13 @@ public class JC19011458_19011461 extends JFrame {
         lbTitle.setHorizontalAlignment(JLabel.LEFT);
 
         JPanel pnBtn = new JPanel();
-        JButton btnSetYearSemester = new JButton("학년/학기 설정");    //학년/학기 설정
-        JButton btnEnterHandle = new JButton("입학 처리");    //TODO 신입생 입학 처리
+        JButton btnSetYearSemester = new JButton("년도/학기 설정");    //년도/학기 설정
+        JButton btnEnterHandle = new JButton("입학 처리");    //신입생 입학 처리
 
         btnSetYearSemester.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //pnCenter.removeAll();
-                //pnCenter.add("North", pnHeader);
+                pnCenter.removeAll();
+                pnCenter.add("North", pnHeader);
                 pnCenter.remove(pnContent);
 
                 /* 내용 */
@@ -589,6 +589,7 @@ public class JC19011458_19011461 extends JFrame {
                 JLabel notice = new JLabel("변경된 값은 프로그램이 종료되면 초기화됩니다.");
                 notice.setHorizontalAlignment(JLabel.CENTER);
                 pnContent.setLayout(new GridLayout(3, 1, 10, 10));
+                pnContent.removeAll();
                 pnContent.add(notice);
                 pnContent.add(pnForm);
                 pnContent.add(new JLabel(""));
@@ -4243,6 +4244,10 @@ public class JC19011458_19011461 extends JFrame {
                     query += update_major_no_check.getText() + " = " + update_major_no.getText() + ", ";
                 }
                 if (update_minor_no_check.isSelected()) {
+                    if (update_minor_no.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "부전공을 입력하거나 체크를 해제해주세요", "", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     if (!update_minor_no.getText().equals("") && selectDepartmentNo().contains(" " + update_minor_no.getText() + " ") == false) {
                         JOptionPane.showMessageDialog(null, "부전공 학과가 존재하지 않습니다.", "", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -4944,7 +4949,7 @@ public class JC19011458_19011461 extends JFrame {
                 if (result == JOptionPane.OK_OPTION) {
                     try {
                         stmt = con.createStatement();
-                        String query = String.format("INSERT INTO course VALUES(%s, %s, '', '', '', '', '', '')", insert_lecture_no.getText(), insert_student_no.getText());
+                        String query = String.format("INSERT INTO course VALUES(%s, %s, null, null, null, null, null, null)", insert_lecture_no.getText(), insert_student_no.getText());
                         System.out.println(query);
                         stmt.execute(query);
                         JOptionPane.showMessageDialog(null, "입력 성공", "", JOptionPane.PLAIN_MESSAGE);
@@ -5034,11 +5039,11 @@ public class JC19011458_19011461 extends JFrame {
                     return;
                 }
                 String query = "UPDATE course SET ";
-                query += update_attendance_score_check.getText() + " = " + (update_attendance_score.getText().equals("") ? "''" : update_attendance_score.getText()) + ", ";
-                query += update_midterm_score_check.getText() + " = " + (update_midterm_score.getText().equals("") ? "''" : update_midterm_score.getText()) + ", ";
-                query += update_finals_score_check.getText() + " = " + (update_finals_score.getText().equals("") ? "''" : update_finals_score.getText()) + ", ";query += update_other_score_check.getText() + " = " + (update_other_score.getText().equals("") ? "''" : update_other_score.getText()) + ", ";
-                query += update_total_score_check.getText() + " = " + (update_total_score.getText().equals("") ? "''" : update_total_score.getText()) + ", ";
-                query += update_grade_check.getText() + " = " + (update_grade.getText().equals("") ? "''" : "'" + update_grade.getText() + "'");
+                query += update_attendance_score_check.getText() + " = " + (update_attendance_score.getText().equals("") ? "null" : update_attendance_score.getText()) + ", ";
+                query += update_midterm_score_check.getText() + " = " + (update_midterm_score.getText().equals("") ? "null" : update_midterm_score.getText()) + ", ";
+                query += update_finals_score_check.getText() + " = " + (update_finals_score.getText().equals("") ? "null" : update_finals_score.getText()) + ", ";query += update_other_score_check.getText() + " = " + (update_other_score.getText().equals("") ? "''" : update_other_score.getText()) + ", ";
+                query += update_total_score_check.getText() + " = " + (update_total_score.getText().equals("") ? "null" : update_total_score.getText()) + ", ";
+                query += update_grade_check.getText() + " = " + (update_grade.getText().equals("") ? "null" : "'" + update_grade.getText() + "'");
                 query += " WHERE lecture_no = " + update_lecture_no.getText() + " AND student_no = " + update_student_no.getText();
                 System.out.println(query);
                 int result = JOptionPane.showConfirmDialog(null, "실행 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
@@ -5079,7 +5084,7 @@ public class JC19011458_19011461 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int result = JOptionPane.showConfirmDialog(null, "삭제 하시겠습니까?", "", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
-                    if (deleteFrom("DELETE FROM club WHERE " + delete_where.getText()) == true) {
+                    if (deleteFrom("DELETE FROM course WHERE " + delete_where.getText()) == true) {
                         JOptionPane.showMessageDialog(null, "삭제 완료", "", JOptionPane.PLAIN_MESSAGE);
                         ((AbstractButton) pnBtn.getComponent(7)).doClick();
                     } else {
